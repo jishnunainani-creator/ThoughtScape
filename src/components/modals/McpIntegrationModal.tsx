@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { McpActivityLog } from '../../hooks/useMcpSync';
 
+import { Board } from '../../types';
+
 interface McpIntegrationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -22,11 +24,16 @@ interface McpIntegrationModalProps {
   serverUrl: string;
   activityLogs: McpActivityLog[];
   onReconnect: () => void;
+  activeLandscapeId?: string;
+  activeLandscapeName?: string;
+  boards?: Board[];
+  onSelectLandscape?: (id: string) => void;
   onExecuteAiPrompt?: (
     topic: string,
     mapType?: 'concept-map' | 'mindmap' | 'hierarchy' | 'flowchart',
     detailLevel?: 'overview' | 'standard' | 'detailed',
-    instructions?: string
+    instructions?: string,
+    targetLandscapeId?: string
   ) => Promise<void>;
   isGenerating?: boolean;
 }
@@ -38,14 +45,26 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({
   serverUrl,
   activityLogs,
   onReconnect,
+  activeLandscapeId,
+  activeLandscapeName,
+  boards = [],
+  onSelectLandscape,
   onExecuteAiPrompt,
   isGenerating = false,
 }) => {
   const [activeTab, setActiveTab] = useState<'prompt' | 'setup' | 'tools' | 'activity'>('prompt');
   const [promptTopic, setPromptTopic] = useState('');
+  const [targetBoardId, setTargetBoardId] = useState<string>(activeLandscapeId || '');
   const [mapType, setMapType] = useState<'concept-map' | 'mindmap' | 'hierarchy' | 'flowchart'>('concept-map');
   const [detailLevel, setDetailLevel] = useState<'overview' | 'standard' | 'detailed'>('standard');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  // Keep targetBoardId in sync with activeLandscapeId
+  React.useEffect(() => {
+    if (activeLandscapeId) {
+      setTargetBoardId(activeLandscapeId);
+    }
+  }, [activeLandscapeId]);
 
   if (!isOpen) return null;
 
@@ -58,7 +77,8 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({
   const handleGenerate = async (topicToUse?: string) => {
     const targetTopic = (topicToUse || promptTopic).trim();
     if (!targetTopic || !onExecuteAiPrompt || isGenerating) return;
-    await onExecuteAiPrompt(targetTopic, mapType, detailLevel);
+    const destId = targetBoardId || activeLandscapeId;
+    await onExecuteAiPrompt(targetTopic, mapType, detailLevel, undefined, destId);
   };
 
   const quickTopics = [
@@ -304,6 +324,37 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({
                       )}
                     </button>
                   </div>
+                </div>
+
+                {/* Target Landscape Indicator */}
+                <div className="flex items-center justify-between p-2.5 bg-white/80 rounded-xl border border-blue-200/60 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px]">🏞️</span>
+                    <span className="font-semibold text-slate-700">Target Landscape:</span>
+                    {boards.length > 1 ? (
+                      <select
+                        value={targetBoardId}
+                        onChange={(e) => {
+                          setTargetBoardId(e.target.value);
+                          if (onSelectLandscape) onSelectLandscape(e.target.value);
+                        }}
+                        className="bg-blue-50 border border-blue-200 text-blue-800 font-semibold px-2 py-0.5 rounded-lg text-xs focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                      >
+                        {boards.map((b) => (
+                          <option key={b.id} value={b.id}>
+                            {b.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="bg-blue-100/70 text-blue-800 font-bold px-2 py-0.5 rounded-lg text-xs">
+                        {activeLandscapeName || 'My Thoughtscape'}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    ID: {targetBoardId || activeLandscapeId}
+                  </span>
                 </div>
 
                 {/* Options (Map Type & Detail Level) */}

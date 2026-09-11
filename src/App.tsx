@@ -221,11 +221,13 @@ export function App() {
     executeAiPrompt,
     reconnect: reconnectMcp,
   } = useMcpSync({
+    boards,
     activeBoardId,
     selectedNoteId,
     selectedGroupId,
     notes,
     groups,
+    connections,
     onWorkspaceUpdate: (incomingData) => {
       restoreWorkspace(incomingData);
     },
@@ -750,6 +752,10 @@ export function App() {
         serverUrl={mcpServerUrl}
         activityLogs={mcpActivityLogs}
         onReconnect={reconnectMcp}
+        activeLandscapeId={activeBoardId}
+        activeLandscapeName={boards.find((b) => b.id === activeBoardId)?.name}
+        boards={boards}
+        onSelectLandscape={switchBoard}
         onExecuteAiPrompt={executeAiPrompt}
         isGenerating={isAiGenerating}
       />

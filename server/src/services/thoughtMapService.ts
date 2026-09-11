@@ -33,14 +33,9 @@ export class ThoughtMapService {
       throw new Error('A non-empty topic string is required to generate a thought map.');
     }
 
+    const targetBoard = this.storage.resolveLandscape(params.landscapeId);
+    const boardId = targetBoard.id;
     const ws = this.storage.getWorkspace();
-    const boardId = params.landscapeId || ws.activeBoardId;
-
-    // Check landscape exists
-    const boardExists = ws.boards.some((b) => b.id === boardId);
-    if (!boardExists) {
-      throw new Error(`Target landscape "${boardId}" does not exist.`);
-    }
 
     // 1. Resolve or Generate Map Specifications
     let thoughts: MapThoughtSpec[] = params.thoughts || [];

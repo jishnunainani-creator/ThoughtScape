@@ -25,8 +25,8 @@ export class StorageProvider extends EventEmitter {
 
   private getDefaultWorkspace(): WorkspaceData {
     const defaultBoard: Board = {
-      id: 'default',
-      name: 'My Thoughtscape',
+      id: 'landscape_welcome',
+      name: 'Welcome to Thoughtscape',
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -36,7 +36,7 @@ export class StorageProvider extends EventEmitter {
       appName: 'Thoughtscape',
       lastModified: Date.now(),
       boards: [defaultBoard],
-      activeBoardId: 'default',
+      activeBoardId: 'landscape_welcome',
       notes: [],
       groups: [],
       connections: [],
@@ -44,16 +44,116 @@ export class StorageProvider extends EventEmitter {
       trash: [],
       snapshots: [],
       colorMeanings: {
-        yellow: 'General thoughts',
-        blue: 'Key concepts',
-        pink: 'Important points',
-        green: 'Solutions & Ideas',
-        purple: 'Questions & Research',
-        orange: 'Urgent & Action',
+        yellow: 'Ideas / Things to Explore',
+        blue: 'Information / References',
+        pink: 'Important / Remember',
+        green: 'Tasks / Plans',
+        purple: 'Questions / Reflections',
+        orange: 'Brainstorm / Creative',
         cyan: 'References',
         coral: 'Insights',
       },
     };
+  }
+
+  public resolveLandscape(targetId?: string, nameHint?: string): Board {
+    if (!this.data.boards || !Array.isArray(this.data.boards)) {
+      this.data.boards = [];
+    }
+
+    // 1. If targetId is provided, find by id or name
+    if (targetId && typeof targetId === 'string' && targetId.trim()) {
+      const clean = targetId.trim();
+
+      // Exact ID match
+      const exact = this.data.boards.find((b) => b.id === clean);
+      if (exact) return exact;
+
+      // Case-insensitive ID match
+      const caseIdMatch = this.data.boards.find((b) => b.id.toLowerCase() === clean.toLowerCase());
+      if (caseIdMatch) return caseIdMatch;
+
+      // Case-insensitive Name match
+      const nameMatch = this.data.boards.find((b) => b.name.toLowerCase() === clean.toLowerCase());
+      if (nameMatch) return nameMatch;
+
+      // If not found, dynamically register this board in the workspace
+      const formatName = (str: string) => {
+        if (nameHint && nameHint.trim()) return nameHint.trim();
+        return str
+          .replace(/^(landscape_|board_)/i, '')
+          .replace(/[_-]/g, ' ')
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+      };
+
+      const newBoard: Board = {
+        id: clean,
+        name: formatName(clean),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      this.data.boards.push(newBoard);
+      this.scheduleSave();
+      return newBoard;
+    }
+
+    // 2. If targetId not provided, look for activeBoardId
+    if (this.data.activeBoardId) {
+      const active = this.data.boards.find((b) => b.id === this.data.activeBoardId);
+      if (active) return active;
+    }
+
+    // 3. Fallback to first existing board
+    if (this.data.boards.length > 0) {
+      this.data.activeBoardId = this.data.boards[0].id;
+      return this.data.boards[0];
+    }
+
+    // 4. Fallback create default board
+    const defaultBoard: Board = {
+      id: 'landscape_welcome',
+      name: 'Welcome to Thoughtscape',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    this.data.boards.push(defaultBoard);
+    this.data.activeBoardId = defaultBoard.id;
+    this.scheduleSave();
+    return defaultBoard;
+  }
+
+  public syncBoards(incomingBoards: Board[]): void {
+    if (!Array.isArray(incomingBoards) || incomingBoards.length === 0) return;
+    if (!this.data.boards || !Array.isArray(this.data.boards)) {
+      this.data.boards = [];
+    }
+
+    const existingMap = new Map(this.data.boards.map((b) => [b.id, b]));
+    let modified = false;
+
+    for (const b of incomingBoards) {
+      if (!b || !b.id) continue;
+      if (!existingMap.has(b.id)) {
+        this.data.boards.push({
+          id: b.id,
+          name: b.name || b.id,
+          createdAt: b.createdAt || Date.now(),
+          updatedAt: b.updatedAt || Date.now(),
+        });
+        modified = true;
+      } else {
+        const existing = existingMap.get(b.id)!;
+        if (b.name && existing.name !== b.name) {
+          existing.name = b.name;
+          existing.updatedAt = Date.now();
+          modified = true;
+        }
+      }
+    }
+
+    if (modified) {
+      this.scheduleSave();
+    }
   }
 
   private loadInitialData(): WorkspaceData {

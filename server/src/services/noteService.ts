@@ -30,8 +30,9 @@ export class NoteService {
   constructor(private storage: StorageProvider) {}
 
   public createThought(input: CreateNoteInput): StickyNote {
+    const targetBoard = this.storage.resolveLandscape(input.landscapeId);
+    const boardId = targetBoard.id;
     const ws = this.storage.getWorkspace();
-    const boardId = input.landscapeId || ws.activeBoardId;
 
     if (!input.content || typeof input.content !== 'string') {
       throw new Error('Content is required and must be a string.');

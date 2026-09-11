@@ -4,165 +4,471 @@
   "lastModified": 1789119662834,
   "boards": [
     {
-      "id": "landscape_main_default",
-      "name": "My Thoughtscape",
+      "id": "landscape_welcome",
+      "name": "Welcome to Thoughtscape",
       "createdAt": 1789119662832,
       "updatedAt": 1789119662832
+    },
+    {
+      "id": "landscape_class10",
+      "name": "Class 10 — Board Preparation",
+      "createdAt": 1789119662832,
+      "updatedAt": 1789119662832
+    },
+    {
+      "id": "landscape_college",
+      "name": "College Semester",
+      "createdAt": 1789119662832,
+      "updatedAt": 1789119662832
+    },
+    {
+      "id": "landscape_work",
+      "name": "Work & Projects",
+      "createdAt": 1789119662832,
+      "updatedAt": 1789119662832
+    },
+    {
+      "id": "landscape_personal",
+      "name": "Personal Life",
+      "createdAt": 1789119662832,
+      "updatedAt": 1789119662832
+    },
+    {
+      "id": "landscape_memories",
+      "name": "My Life & Memories",
+      "createdAt": 1789119662832,
+      "updatedAt": 1789119662832
+    },
+    {
+      "id": "my_custom_project_landscape",
+      "name": "My Custom Project Landscape",
+      "createdAt": 1789124611790,
+      "updatedAt": 1789124611790
     }
   ],
-  "activeBoardId": "landscape_main_default",
+  "activeBoardId": "landscape_welcome",
   "notes": [
     {
-      "title": "Two Pointers Pattern",
-      "content": "Used on sorted arrays or palindromes.\n• Opposite ends (e.g. 2Sum II)\n• Fast & Slow pointer (Cycle detection)\n• Sliding Window derivation",
-      "type": "concept",
-      "color": "blue",
-      "x": 100,
-      "y": 100,
-      "width": 210,
-      "height": 180,
-      "rotation": -0.8,
-      "zIndex": 1,
-      "tags": [
-        "dsa",
-        "patterns"
-      ],
-      "starred": true,
-      "pinned": false,
-      "id": "note_1788874863433_0",
-      "createdAt": 1788874863433,
-      "updatedAt": 1789107595023,
-      "boardId": "landscape_main_default",
-      "locked": false
-    },
-    {
-      "title": "Sliding Window",
-      "content": "Maintains a sub-segment state.\n• Fixed size window (Sum of K items)\n• Dynamic size (Longest substring with K distinct chars)\n• Shrink condition check",
-      "type": "concept",
+      "id": "note_1789124603755_c3yly",
+      "boardId": "landscape_welcome",
+      "title": "Photosynthesis",
+      "content": "**Core Definition**\nCentral concept and mental model for understanding Photosynthesis.\n\n*Key takeaway*: Form the foundation before exploring variants.",
       "color": "yellow",
-      "x": 400,
-      "y": 100,
-      "width": 210,
-      "height": 180,
-      "rotation": -0.8,
+      "type": "concept",
+      "x": 600,
+      "y": 360,
+      "width": 260,
+      "height": 210,
       "zIndex": 2,
       "tags": [
-        "dsa",
-        "window"
+        "photosynthesis"
       ],
-      "starred": false,
+      "starred": true,
       "pinned": false,
-      "id": "note_1788874863433_1",
-      "createdAt": 1788874863433,
-      "updatedAt": 1789109333477,
-      "boardId": "landscape_main_default",
-      "locked": false
+      "locked": false,
+      "groupId": "group_1789124603755_qqbg7",
+      "createdAt": 1789124603756,
+      "updatedAt": 1789124603756
     },
     {
-      "title": "Binary Search On Answer",
-      "content": "When search space is monotonic: F F F T T T.\nFind first True condition.\n`mid = left + (right-left)//2`",
-      "type": "code",
-      "color": "purple",
-      "x": 700,
-      "y": 100,
-      "width": 210,
-      "height": 180,
-      "rotation": -0.8,
+      "id": "note_1789124603755_u1kde",
+      "boardId": "landscape_welcome",
+      "title": "Photosynthesis Prerequisites",
+      "content": "Foundational knowledge and data representation required to grasp Photosynthesis.\n\n- Invariants\n- Base conditions\n- Assumptions",
+      "color": "blue",
+      "type": "reference",
+      "x": 200,
+      "y": 240,
+      "width": 260,
+      "height": 210,
       "zIndex": 3,
       "tags": [
-        "binarysearch"
+        "photosynthesis"
       ],
-      "starred": true,
+      "starred": false,
       "pinned": false,
-      "id": "note_1788874863433_2",
-      "createdAt": 1788874863433,
-      "updatedAt": 1789106919500,
-      "boardId": "landscape_main_default",
-      "locked": false
+      "locked": false,
+      "groupId": "group_1789124603755_qqbg7",
+      "createdAt": 1789124603756,
+      "updatedAt": 1789124603756
     },
     {
-      "title": "Arrays & Dynamic Arrays",
-      "content": "O(1) access by index.\nAmortized O(1) append.\nContiguous memory allocation.",
-      "type": "normal",
+      "id": "note_1789124603755_u7txd",
+      "boardId": "landscape_welcome",
+      "title": "Core Mechanism & Flow",
+      "content": "Step-by-step logic execution:\n\n1. Initialize pointers/boundaries\n2. Iterate while condition holds\n3. Calculate midpoint/decision\n4. Narrow search space",
       "color": "green",
-      "x": 1000,
-      "y": 100,
-      "width": 210,
-      "height": 170,
-      "rotation": -0.8,
+      "type": "concept",
+      "x": 600,
+      "y": 670,
+      "width": 260,
+      "height": 210,
       "zIndex": 4,
       "tags": [
-        "array"
+        "photosynthesis"
       ],
       "starred": false,
       "pinned": false,
-      "id": "note_1788874863433_3",
-      "createdAt": 1788874863433,
-      "updatedAt": 1789106919500,
-      "boardId": "landscape_main_default",
-      "locked": false
+      "locked": false,
+      "groupId": "group_1789124603755_qqbg7",
+      "createdAt": 1789124603756,
+      "updatedAt": 1789124603756
     },
     {
-      "title": "Hash Maps & Sets",
-      "content": "O(1) average lookup, insert, delete.\nHandle collisions via chaining or open addressing.\nCheck edge cases with empty keys.",
-      "type": "normal",
-      "color": "peach",
-      "x": 1300,
-      "y": 100,
-      "width": 210,
-      "height": 170,
-      "rotation": -0.8,
-      "zIndex": 1,
+      "id": "note_1789124603755_sw0d0",
+      "boardId": "landscape_welcome",
+      "title": "Common Patterns & Applications",
+      "content": "Where Photosynthesis appears in practice:\n\n- Finding peak elements\n- Range queries\n- Optimization over monotonic functions",
+      "color": "orange",
+      "type": "action",
+      "x": 1000,
+      "y": 260,
+      "width": 260,
+      "height": 210,
+      "zIndex": 5,
       "tags": [
-        "hashmap"
+        "photosynthesis"
       ],
       "starred": false,
       "pinned": false,
-      "id": "note_1788874863433_4",
-      "createdAt": 1788874863433,
-      "updatedAt": 1789106919500,
-      "boardId": "landscape_main_default",
-      "locked": false
+      "locked": false,
+      "groupId": "group_1789124603755_4v6bt",
+      "createdAt": 1789124603756,
+      "updatedAt": 1789124603756
     },
     {
-      "title": "Common Mistake Checklist",
-      "content": "• Index out of bounds (off by one)\n• Unhandled empty input []\n• Integer overflow on mid calc\n• Infinite loop in while(left <= right)",
-      "type": "task",
-      "color": "red",
-      "x": 1600,
-      "y": 100,
-      "width": 210,
-      "height": 170,
-      "rotation": -0.8,
+      "id": "note_1789124603755_7u27y",
+      "boardId": "landscape_welcome",
+      "title": "Edge Cases & Pitfalls",
+      "content": "Watch out for:\n\n⚠️ Integer overflow in midpoint calculation\n⚠️ Infinite loop on boundary updates\n⚠️ Single-element collections",
+      "color": "pink",
+      "type": "warning",
+      "x": 440,
+      "y": 960,
+      "width": 260,
+      "height": 210,
       "zIndex": 6,
       "tags": [
-        "pitfalls"
+        "photosynthesis"
+      ],
+      "starred": false,
+      "pinned": false,
+      "locked": false,
+      "groupId": "group_1789124603755_4v6bt",
+      "createdAt": 1789124603756,
+      "updatedAt": 1789124603756
+    },
+    {
+      "id": "note_1789124603755_ab0kn",
+      "boardId": "landscape_welcome",
+      "title": "Self-Check Question",
+      "content": "*Question*: Why is the array sorted invariant necessary for this algorithm?\n\n*Hint*: What happens to the monotonic property if unsorted?",
+      "color": "purple",
+      "type": "question",
+      "x": 760,
+      "y": 960,
+      "width": 260,
+      "height": 210,
+      "zIndex": 7,
+      "tags": [
+        "photosynthesis"
+      ],
+      "starred": false,
+      "pinned": false,
+      "locked": false,
+      "createdAt": 1789124603756,
+      "updatedAt": 1789124603756
+    },
+    {
+      "id": "note_1789124611790_t2vko",
+      "boardId": "my_custom_project_landscape",
+      "title": "Compiler Optimization",
+      "content": "**Core Definition**\nCentral concept and mental model for understanding Compiler Optimization.\n\n*Key takeaway*: Form the foundation before exploring variants.",
+      "color": "yellow",
+      "type": "concept",
+      "x": 600,
+      "y": 360,
+      "width": 260,
+      "height": 210,
+      "zIndex": 8,
+      "tags": [
+        "compiler-optimization"
       ],
       "starred": true,
       "pinned": false,
-      "id": "note_1788874863433_5",
-      "createdAt": 1788874863433,
-      "updatedAt": 1789106919500,
-      "boardId": "landscape_main_default",
-      "locked": false
+      "locked": false,
+      "groupId": "group_1789124611790_l2gey",
+      "createdAt": 1789124611790,
+      "updatedAt": 1789124611790
+    },
+    {
+      "id": "note_1789124611790_pjszq",
+      "boardId": "my_custom_project_landscape",
+      "title": "Compiler Optimization Prerequisites",
+      "content": "Foundational knowledge and data representation required to grasp Compiler Optimization.\n\n- Invariants\n- Base conditions\n- Assumptions",
+      "color": "blue",
+      "type": "reference",
+      "x": 200,
+      "y": 240,
+      "width": 260,
+      "height": 210,
+      "zIndex": 9,
+      "tags": [
+        "compiler-optimization"
+      ],
+      "starred": false,
+      "pinned": false,
+      "locked": false,
+      "groupId": "group_1789124611790_l2gey",
+      "createdAt": 1789124611790,
+      "updatedAt": 1789124611790
+    },
+    {
+      "id": "note_1789124611790_91hum",
+      "boardId": "my_custom_project_landscape",
+      "title": "Core Mechanism & Flow",
+      "content": "Step-by-step logic execution:\n\n1. Initialize pointers/boundaries\n2. Iterate while condition holds\n3. Calculate midpoint/decision\n4. Narrow search space",
+      "color": "green",
+      "type": "concept",
+      "x": 600,
+      "y": 670,
+      "width": 260,
+      "height": 210,
+      "zIndex": 10,
+      "tags": [
+        "compiler-optimization"
+      ],
+      "starred": false,
+      "pinned": false,
+      "locked": false,
+      "groupId": "group_1789124611790_l2gey",
+      "createdAt": 1789124611790,
+      "updatedAt": 1789124611790
+    },
+    {
+      "id": "note_1789124611790_ndreh",
+      "boardId": "my_custom_project_landscape",
+      "title": "Common Patterns & Applications",
+      "content": "Where Compiler Optimization appears in practice:\n\n- Finding peak elements\n- Range queries\n- Optimization over monotonic functions",
+      "color": "orange",
+      "type": "action",
+      "x": 1000,
+      "y": 260,
+      "width": 260,
+      "height": 210,
+      "zIndex": 11,
+      "tags": [
+        "compiler-optimization"
+      ],
+      "starred": false,
+      "pinned": false,
+      "locked": false,
+      "groupId": "group_1789124611790_00w3k",
+      "createdAt": 1789124611790,
+      "updatedAt": 1789124611790
+    },
+    {
+      "id": "note_1789124611790_lhoxs",
+      "boardId": "my_custom_project_landscape",
+      "title": "Edge Cases & Pitfalls",
+      "content": "Watch out for:\n\n⚠️ Integer overflow in midpoint calculation\n⚠️ Infinite loop on boundary updates\n⚠️ Single-element collections",
+      "color": "pink",
+      "type": "warning",
+      "x": 440,
+      "y": 960,
+      "width": 260,
+      "height": 210,
+      "zIndex": 12,
+      "tags": [
+        "compiler-optimization"
+      ],
+      "starred": false,
+      "pinned": false,
+      "locked": false,
+      "groupId": "group_1789124611790_00w3k",
+      "createdAt": 1789124611790,
+      "updatedAt": 1789124611790
+    },
+    {
+      "id": "note_1789124611790_vue0p",
+      "boardId": "my_custom_project_landscape",
+      "title": "Self-Check Question",
+      "content": "*Question*: Why is the array sorted invariant necessary for this algorithm?\n\n*Hint*: What happens to the monotonic property if unsorted?",
+      "color": "purple",
+      "type": "question",
+      "x": 760,
+      "y": 960,
+      "width": 260,
+      "height": 210,
+      "zIndex": 13,
+      "tags": [
+        "compiler-optimization"
+      ],
+      "starred": false,
+      "pinned": false,
+      "locked": false,
+      "createdAt": 1789124611790,
+      "updatedAt": 1789124611790
     }
   ],
   "groups": [
     {
-      "title": "Data Structures Reference",
-      "description": "Fundamental storage mechanisms",
-      "color": "green",
-      "x": 289,
-      "y": 356,
-      "width": 780,
-      "height": 380,
-      "collapsed": false,
-      "id": "group_1788874863433_1",
-      "createdAt": 1788874863433,
-      "updatedAt": 1789106938482,
-      "boardId": "landscape_main_default",
-      "locked": false
+      "id": "group_1789124603755_qqbg7",
+      "boardId": "landscape_welcome",
+      "title": "Photosynthesis — Core Fundamentals",
+      "description": "Mental models and execution mechanics",
+      "color": "blue",
+      "x": 160,
+      "y": 170,
+      "width": 740,
+      "height": 750,
+      "isCollapsed": false,
+      "createdAt": 1789124603756
+    },
+    {
+      "id": "group_1789124603755_4v6bt",
+      "boardId": "landscape_welcome",
+      "title": "Patterns & Practical Applications",
+      "description": "Real-world problem solving patterns",
+      "color": "orange",
+      "x": 400,
+      "y": 190,
+      "width": 900,
+      "height": 1020,
+      "isCollapsed": false,
+      "createdAt": 1789124603756
+    },
+    {
+      "id": "group_1789124611790_l2gey",
+      "boardId": "my_custom_project_landscape",
+      "title": "Compiler Optimization — Core Fundamentals",
+      "description": "Mental models and execution mechanics",
+      "color": "blue",
+      "x": 160,
+      "y": 170,
+      "width": 740,
+      "height": 750,
+      "isCollapsed": false,
+      "createdAt": 1789124611790
+    },
+    {
+      "id": "group_1789124611790_00w3k",
+      "boardId": "my_custom_project_landscape",
+      "title": "Patterns & Practical Applications",
+      "description": "Real-world problem solving patterns",
+      "color": "orange",
+      "x": 400,
+      "y": 190,
+      "width": 900,
+      "height": 1020,
+      "isCollapsed": false,
+      "createdAt": 1789124611790
     }
   ],
-  "connections": []
+  "connections": [
+    {
+      "id": "conn_1789124603756_2buu9",
+      "boardId": "landscape_welcome",
+      "sourceId": "note_1789124603755_u1kde",
+      "targetId": "note_1789124603755_c3yly",
+      "type": "arrow",
+      "label": "foundation for",
+      "createdAt": 1789124603756
+    },
+    {
+      "id": "conn_1789124603756_xyuk7",
+      "boardId": "landscape_welcome",
+      "sourceId": "note_1789124603755_c3yly",
+      "targetId": "note_1789124603755_u7txd",
+      "type": "arrow",
+      "label": "executes via",
+      "createdAt": 1789124603756
+    },
+    {
+      "id": "conn_1789124603756_jv9hk",
+      "boardId": "landscape_welcome",
+      "sourceId": "note_1789124603755_u7txd",
+      "targetId": "note_1789124603755_sw0d0",
+      "type": "arrow",
+      "label": "applies to",
+      "createdAt": 1789124603756
+    },
+    {
+      "id": "conn_1789124603756_r12ss",
+      "boardId": "landscape_welcome",
+      "sourceId": "note_1789124603755_c3yly",
+      "targetId": "note_1789124603755_7u27y",
+      "type": "dashed",
+      "label": "edge cases",
+      "createdAt": 1789124603756
+    },
+    {
+      "id": "conn_1789124603756_g1yth",
+      "boardId": "landscape_welcome",
+      "sourceId": "note_1789124603755_c3yly",
+      "targetId": "note_1789124603755_ab0kn",
+      "type": "step",
+      "label": "test understanding",
+      "createdAt": 1789124603756
+    },
+    {
+      "id": "conn_1789124611790_4mho7",
+      "boardId": "my_custom_project_landscape",
+      "sourceId": "note_1789124611790_pjszq",
+      "targetId": "note_1789124611790_t2vko",
+      "type": "arrow",
+      "label": "foundation for",
+      "createdAt": 1789124611790
+    },
+    {
+      "id": "conn_1789124611790_1fi3a",
+      "boardId": "my_custom_project_landscape",
+      "sourceId": "note_1789124611790_t2vko",
+      "targetId": "note_1789124611790_91hum",
+      "type": "arrow",
+      "label": "executes via",
+      "createdAt": 1789124611790
+    },
+    {
+      "id": "conn_1789124611790_9p2nt",
+      "boardId": "my_custom_project_landscape",
+      "sourceId": "note_1789124611790_91hum",
+      "targetId": "note_1789124611790_ndreh",
+      "type": "arrow",
+      "label": "applies to",
+      "createdAt": 1789124611790
+    },
+    {
+      "id": "conn_1789124611790_uxo85",
+      "boardId": "my_custom_project_landscape",
+      "sourceId": "note_1789124611790_t2vko",
+      "targetId": "note_1789124611790_lhoxs",
+      "type": "dashed",
+      "label": "edge cases",
+      "createdAt": 1789124611790
+    },
+    {
+      "id": "conn_1789124611790_v9fnh",
+      "boardId": "my_custom_project_landscape",
+      "sourceId": "note_1789124611790_t2vko",
+      "targetId": "note_1789124611790_vue0p",
+      "type": "step",
+      "label": "test understanding",
+      "createdAt": 1789124611790
+    }
+  ],
+  "stacks": [],
+  "trash": [],
+  "snapshots": [],
+  "colorMeanings": {
+    "yellow": "Ideas / Things to Explore",
+    "blue": "Information / References",
+    "pink": "Important / Remember",
+    "green": "Tasks / Plans",
+    "purple": "Questions / Reflections",
+    "peach": "Personal Notes",
+    "orange": "Brainstorm / Creative",
+    "red": "Mistakes / Pitfalls",
+    "white": "Code & Neutral"
+  }
 }

@@ -31,12 +31,7 @@ export class BoardService {
     connections?: any[];
   } {
     const ws = this.storage.getWorkspace();
-    const targetId = landscapeId || ws.activeBoardId;
-    const board = ws.boards.find((b) => b.id === targetId) || ws.boards[0];
-
-    if (!board) {
-      throw new Error(`Landscape with ID "${targetId}" not found.`);
-    }
+    const board = this.storage.resolveLandscape(landscapeId);
 
     const result: any = { landscape: board };
 

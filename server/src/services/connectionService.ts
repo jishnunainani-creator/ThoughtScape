@@ -13,8 +13,9 @@ export class ConnectionService {
   constructor(private storage: StorageProvider) {}
 
   public createConnection(input: CreateConnectionInput): Connection {
+    const targetBoard = this.storage.resolveLandscape(input.landscapeId);
+    const boardId = targetBoard.id;
     const ws = this.storage.getWorkspace();
-    const boardId = input.landscapeId || ws.activeBoardId;
 
     if (!input.sourceThoughtId || !input.targetThoughtId) {
       throw new Error('Both sourceThoughtId and targetThoughtId are required.');

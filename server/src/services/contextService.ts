@@ -6,9 +6,14 @@ export class ContextService {
 
   constructor(private storage: StorageProvider) {}
 
-  public updateContext(partial: Partial<CurrentContext>): void {
+  public updateContext(partial: Partial<CurrentContext> & { boards?: any[] }): void {
+    if (partial.boards && Array.isArray(partial.boards)) {
+      this.storage.syncBoards(partial.boards);
+    }
+
     const ws = this.storage.getWorkspace();
-    const activeBoard = ws.boards.find((b) => b.id === (partial.activeBoardId || ws.activeBoardId)) || ws.boards[0];
+    const activeBoard = this.storage.resolveLandscape(partial.activeBoardId, partial.activeBoardName);
+    ws.activeBoardId = activeBoard.id;
 
     const currentNotes = ws.notes.filter((n) => (n.boardId || ws.activeBoardId) === activeBoard.id);
     const currentGroups = ws.groups.filter((g) => (g.boardId || ws.activeBoardId) === activeBoard.id);

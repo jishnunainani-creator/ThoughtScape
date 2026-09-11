@@ -1,12 +1,14 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { WorkspaceData, StickyNote, Group } from '../types';
+import { WorkspaceData, StickyNote, Group, Board, Connection } from '../types';
 
 interface UseMcpSyncProps {
+  boards: Board[];
   activeBoardId: string;
   selectedNoteId: string | null;
   selectedGroupId: string | null;
   notes: StickyNote[];
   groups: Group[];
+  connections?: Connection[];
   enabled?: boolean;
   onWorkspaceUpdate?: (data: WorkspaceData) => void;
   onShowToast?: (message: string, type: 'info' | 'success' | 'warning' | 'error') => void;
@@ -20,11 +22,13 @@ export interface McpActivityLog {
 }
 
 export function useMcpSync({
+  boards,
   activeBoardId,
   selectedNoteId,
   selectedGroupId,
   notes,
   groups,
+  connections = [],
   enabled = true,
   onWorkspaceUpdate,
   onShowToast,
@@ -37,6 +41,7 @@ export function useMcpSync({
   const hasInitializedServerRef = useRef(false);
 
   const serverUrl = 'http://localhost:3001';
+  const activeBoard = boards.find((b) => b.id === activeBoardId) || boards[0];
 
   // 1. Check health / connection actively
   const checkHealth = useCallback(async () => {
@@ -52,10 +57,10 @@ export function useMcpSync({
     return false;
   }, [serverUrl]);
 
-  // 2. Report real-time UI selection context to MCP Server (only if connected)
+  // 2. Report real-time UI selection context and current active landscape to MCP Server
   useEffect(() => {
     if (!enabled || !isConnected) return;
-    const selectionKey = `${activeBoardId}:${selectedNoteId || ''}:${selectedGroupId || ''}`;
+    const selectionKey = `${activeBoardId}:${selectedNoteId || ''}:${selectedGroupId || ''}:${boards.length}`;
     if (selectionKey === lastReportedSelectionRef.current) return;
     lastReportedSelectionRef.current = selectionKey;
 
@@ -68,11 +73,14 @@ export function useMcpSync({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           activeBoardId,
+          activeBoardName: activeBoard?.name || 'My Thoughtscape',
+          boards: boards.map((b) => ({ id: b.id, name: b.name, createdAt: b.createdAt, updatedAt: b.updatedAt })),
           selectedNoteId,
           selectedNoteTitle: selectedNote?.title,
           selectedNoteContent: selectedNote?.content,
           selectedGroupId,
           selectedGroupTitle: selectedGroup?.title,
+          totalConnections: connections.length,
         }),
       }).catch(() => {
         // Server not running, ignore gracefully
@@ -80,7 +88,7 @@ export function useMcpSync({
     } catch {
       // Safe fallback
     }
-  }, [activeBoardId, selectedNoteId, selectedGroupId, notes, groups, serverUrl, enabled, isConnected]);
+  }, [activeBoardId, activeBoard, boards, selectedNoteId, selectedGroupId, notes, groups, connections, serverUrl, enabled, isConnected]);
 
   // 3. Connect to Server-Sent Events (SSE) stream for live updates
   const connectSse = useCallback(() => {
@@ -213,15 +221,22 @@ export function useMcpSync({
 
   // Execute AI Prompt directly from UI
   const executeAiPrompt = useCallback(
-    async (topic: string, mapType = 'concept', detailLevel = 'detailed', userInstructions = '') => {
+    async (
+      topic: string,
+      mapType = 'concept',
+      detailLevel = 'detailed',
+      userInstructions = '',
+      targetLandscapeId?: string
+    ) => {
       if (!topic.trim()) return;
       setIsGenerating(true);
+      const destinationBoardId = targetLandscapeId || activeBoardId;
       try {
         const res = await fetch(`${serverUrl}/api/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            landscapeId: activeBoardId,
+            landscapeId: destinationBoardId,
             topic: topic.trim(),
             mapType,
             detailLevel,

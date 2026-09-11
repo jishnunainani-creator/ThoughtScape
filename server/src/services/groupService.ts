@@ -17,8 +17,9 @@ export class GroupService {
   constructor(private storage: StorageProvider) {}
 
   public createCluster(input: CreateClusterInput): Group {
+    const targetBoard = this.storage.resolveLandscape(input.landscapeId);
+    const boardId = targetBoard.id;
     const ws = this.storage.getWorkspace();
-    const boardId = input.landscapeId || ws.activeBoardId;
 
     if (!input.title || typeof input.title !== 'string') {
       throw new Error('Cluster title is required and must be a string.');
