@@ -451,6 +451,10 @@ export function App() {
         isPresentationMode={isPresentationMode}
         activeEnvironmentName={activeEnvironment.name}
         isMcpConnected={isMcpConnected}
+        onAddNote={() => {
+          const centerWorld = screenToWorld(window.innerWidth / 2, window.innerHeight / 2);
+          addNote({ x: centerWorld.x - 130, y: centerWorld.y - 105 });
+        }}
         onOpenEnvironmentModal={() => setIsEnvironmentModalOpen(true)}
         onOpenMcpModal={() => setIsMcpModalOpen(true)}
         onSwitchBoard={switchBoard}
