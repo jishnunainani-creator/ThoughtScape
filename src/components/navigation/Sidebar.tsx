@@ -332,11 +332,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Clusters & Sections */}
+        {/* Clusters */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-              Clusters & Sections
+              Clusters
             </span>
             <button
               onClick={onAddGroup}

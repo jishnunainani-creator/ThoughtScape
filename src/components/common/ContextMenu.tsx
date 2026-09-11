@@ -266,7 +266,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
             className="w-full flex items-center gap-2.5 px-3.5 py-1.5 hover:bg-blue-50 hover:text-blue-700 text-left"
           >
             <FolderPlus className="w-3.5 h-3.5 text-slate-400" />
-            <span>New Section Cluster</span>
+            <span>New Thought Cluster</span>
           </button>
 
           <div className="h-px bg-slate-100 my-1" />

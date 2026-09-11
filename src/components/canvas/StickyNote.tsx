@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { StickyNote as StickyNoteType, TaskItem, MistakeDetails, EnvironmentDefinition, NoteVisualTheme } from '../../types';
+import { StickyNote as StickyNoteType, TaskItem, MistakeDetails, EnvironmentDefinition, NoteVisualTheme, Group as GroupType } from '../../types';
 import { STICKY_COLORS, NOTE_TYPE_INFO, LEARNING_STATE_INFO } from '../../constants/colors';
 import {
   Pin,
@@ -19,6 +19,7 @@ import { playDropSound } from '../../utils/sound';
 interface StickyNoteProps {
   note: StickyNoteType;
   allNotes?: StickyNoteType[];
+  groups?: GroupType[];
   isSelected: boolean;
   isConnectingSource: boolean;
   scale: number;
@@ -29,11 +30,13 @@ interface StickyNoteProps {
   onStartConnection: () => void;
   onNavigateToNote?: (targetTitleOrId: string) => void;
   onFocusNote?: () => void;
+  onDragOverGroup?: (groupId: string | null) => void;
 }
 
 export const StickyNote: React.FC<StickyNoteProps> = ({
   note,
   allNotes = [],
+  groups = [],
   isSelected,
   isConnectingSource,
   scale,
@@ -44,6 +47,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
   onStartConnection,
   onNavigateToNote,
   onFocusNote,
+  onDragOverGroup,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -70,6 +74,32 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
       )
     : [];
 
+  // Helper to find which cluster the note coordinates are currently over
+  const findClusterAt = (nx: number, ny: number) => {
+    const centerX = nx + note.width / 2;
+    const centerY = ny + note.height / 2;
+
+    for (const g of groups) {
+      const memberNotes = allNotes.filter((n) => n.groupId === g.id && n.id !== note.id);
+      let minX = g.x;
+      let minY = g.y;
+      let maxX = g.x + (g.width || 340);
+      let maxY = g.y + (g.height || 180);
+
+      if (memberNotes.length > 0) {
+        minX = Math.min(...memberNotes.map((n) => n.x)) - 32;
+        minY = Math.min(...memberNotes.map((n) => n.y)) - 54;
+        maxX = Math.max(...memberNotes.map((n) => n.x + n.width)) + 32;
+        maxY = Math.max(...memberNotes.map((n) => n.y + n.height)) + 32;
+      }
+
+      if (centerX >= minX && centerX <= maxX && centerY >= minY && centerY <= maxY) {
+        return g;
+      }
+    }
+    return null;
+  };
+
   const handlePointerDown = (e: React.PointerEvent) => {
     if (note.pinned || note.locked || (e.target as HTMLElement).closest('input, textarea, button, a, .no-drag')) {
       return;
@@ -95,11 +125,19 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
 
     const dx = (e.clientX - dragStartRef.current.x) / scale;
     const dy = (e.clientY - dragStartRef.current.y) / scale;
+    const nextX = Math.round(dragStartRef.current.startX + dx);
+    const nextY = Math.round(dragStartRef.current.startY + dy);
+
+    // Track cluster hover
+    const matchingCluster = findClusterAt(nextX, nextY);
+    if (onDragOverGroup) {
+      onDragOverGroup(matchingCluster ? matchingCluster.id : null);
+    }
 
     onUpdate(
       {
-        x: Math.round(dragStartRef.current.startX + dx),
-        y: Math.round(dragStartRef.current.startY + dy),
+        x: nextX,
+        y: nextY,
       },
       false
     );
@@ -115,7 +153,21 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
         // Safe release
       }
       playDropSound();
-      onUpdate({ x: note.x, y: note.y }, true);
+
+      if (onDragOverGroup) {
+        onDragOverGroup(null);
+      }
+
+      // Check if dropped inside a cluster or moved outside previous cluster
+      const matchingCluster = findClusterAt(note.x, note.y);
+      if (matchingCluster) {
+        onUpdate({ x: note.x, y: note.y, groupId: matchingCluster.id }, true);
+      } else if (note.groupId) {
+        // Dropped outside cluster -> disassociate groupId
+        onUpdate({ x: note.x, y: note.y, groupId: undefined }, true);
+      } else {
+        onUpdate({ x: note.x, y: note.y }, true);
+      }
     }
   };
 

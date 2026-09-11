@@ -141,6 +141,7 @@ export const Canvas: React.FC<CanvasProps> = ({
 }) => {
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [cursorWorldPos, setCursorWorldPos] = useState<{ x: number; y: number } | null>(null);
+  const [hoveredGroupId, setHoveredGroupId] = useState<string | null>(null);
 
   const selectedNote = notes.find((n) => n.id === selectedNoteId);
   const connectingSourceNote = notes.find((n) => n.id === connectingSourceId) || null;
@@ -284,6 +285,7 @@ export const Canvas: React.FC<CanvasProps> = ({
                 group={group}
                 notes={notes}
                 isSelected={selectedGroupId === group.id}
+                isHoveredForDrop={hoveredGroupId === group.id}
                 scale={transform.scale}
                 onSelect={(e) => {
                   e.stopPropagation();
@@ -343,6 +345,7 @@ export const Canvas: React.FC<CanvasProps> = ({
               <StickyNote
                 note={note}
                 allNotes={notes}
+                groups={groups}
                 isSelected={selectedNoteId === note.id}
                 isConnectingSource={connectingSourceId === note.id}
                 scale={transform.scale}
@@ -360,6 +363,7 @@ export const Canvas: React.FC<CanvasProps> = ({
                 onStartConnection={() => onStartConnection(note.id)}
                 onNavigateToNote={onNavigateToNote}
                 onFocusNote={() => onFocusNote && onFocusNote(note.id)}
+                onDragOverGroup={setHoveredGroupId}
               />
             </div>
           );

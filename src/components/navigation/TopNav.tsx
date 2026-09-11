@@ -150,17 +150,17 @@ export const TopNav: React.FC<TopNavProps> = ({
             <button
               onClick={handlePrevConcept}
               className="p-1 rounded-full hover:bg-white/10 transition-colors"
-              title="Previous section"
+              title="Previous cluster"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <span className="font-medium text-slate-200">
-              {groups[presentationStep]?.title || 'Section'} ({presentationStep + 1}/{groups.length})
+              {groups[presentationStep]?.title || 'Cluster'} ({presentationStep + 1}/{groups.length})
             </span>
             <button
               onClick={handleNextConcept}
               className="p-1 rounded-full hover:bg-white/10 transition-colors"
-              title="Next section"
+              title="Next cluster"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -407,7 +407,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                 }}
                 className="flex items-center gap-2.5 px-3.5 py-2 hover:bg-slate-50 text-slate-700 text-left transition-colors"
               >
-                <span>Cluster by Sections</span>
+                <span>Organize by Clusters</span>
               </button>
               <button
                 onClick={() => {

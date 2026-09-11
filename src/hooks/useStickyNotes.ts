@@ -447,16 +447,17 @@ export function useStickyNotes() {
 
   // Group operations
   const addGroup = useCallback(
-    (title = 'New Section', color: NoteColor = 'blue', x = 200, y = 200) => {
+    (title = 'New Cluster', color: NoteColor = 'blue', x = 200, y = 200, description?: string) => {
       const newGroup: Group = {
         id: `group_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         boardId: activeBoardId,
         title,
+        description,
         color,
         x,
         y,
-        width: 620,
-        height: 460,
+        width: 340,
+        height: 180,
         collapsed: false,
         locked: false,
         createdAt: Date.now(),

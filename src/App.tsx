@@ -20,6 +20,7 @@ import { TechnicalGuideModal } from './components/modals/TechnicalGuideModal';
 import { EnvironmentModal } from './components/modals/EnvironmentModal';
 import { McpIntegrationModal } from './components/modals/McpIntegrationModal';
 import { FocusedThoughtModal } from './components/modals/FocusedThoughtModal';
+import { CreateClusterModal } from './components/modals/CreateClusterModal';
 import { useMcpSync } from './hooks/useMcpSync';
 import { TutorialWelcomeModal } from './components/tutorial/TutorialWelcomeModal';
 import { TutorialFinishModal } from './components/tutorial/TutorialFinishModal';
@@ -132,6 +133,8 @@ export function App() {
   const [isSnapshotsOpen, setIsSnapshotsOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
+  const [isCreateClusterModalOpen, setIsCreateClusterModalOpen] = useState(false);
+  const [clusterSpawnPos, setClusterSpawnPos] = useState<{ x: number; y: number } | null>(null);
   const [isEnvironmentModalOpen, setIsEnvironmentModalOpen] = useState(false);
   const [isMcpModalOpen, setIsMcpModalOpen] = useState(false);
   const [focusedThoughtId, setFocusedThoughtId] = useState<string | null>(null);
@@ -142,6 +145,12 @@ export function App() {
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const [isPresentationMode, setIsPresentationMode] = useState(false);
   const [showMinimap, setShowMinimap] = useState(true);
+
+  const handleOpenCreateCluster = useCallback((pos?: { x: number; y: number }) => {
+    const targetPos = pos || screenToWorld(window.innerWidth / 2, window.innerHeight / 2);
+    setClusterSpawnPos(targetPos);
+    setIsCreateClusterModalOpen(true);
+  }, [screenToWorld]);
 
   // Active Environment resolution (with live preview capability)
   const activeEnvironment = previewEnvironment || getEnvironmentById(activeEnvironmentSettings.environmentId);
@@ -510,11 +519,7 @@ export function App() {
           deleteBoard(bid);
           showToast('Landscape deleted', 'info');
         }}
-        onAddGroup={() => {
-          const centerWorld = screenToWorld(window.innerWidth / 2, window.innerHeight / 2);
-          addGroup('New Cluster', 'blue', centerWorld.x - 250, centerWorld.y - 180);
-          showToast('Added cluster group', 'success');
-        }}
+        onAddGroup={() => handleOpenCreateCluster()}
         onOpenTemplates={() => setIsTemplatesOpen(true)}
         onOpenSnapshots={() => setIsSnapshotsOpen(true)}
         onOpenEnvironmentModal={() => setIsEnvironmentModalOpen(true)}
@@ -688,11 +693,7 @@ export function App() {
           addNote({ color, x: centerWorld.x - 130, y: centerWorld.y - 105 });
           showToast('Created thought', 'success');
         }}
-        onAddGroup={() => {
-          const centerWorld = screenToWorld(window.innerWidth / 2, window.innerHeight / 2);
-          addGroup('New Cluster', 'blue', centerWorld.x - 250, centerWorld.y - 180);
-          showToast('Created cluster group', 'success');
-        }}
+        onAddGroup={() => handleOpenCreateCluster()}
         onOrganize={handleOrganize}
         onGenerateConceptMap={handleGenerateConceptMap}
         onScatterNotes={handleScatterNotes}
@@ -807,6 +808,17 @@ export function App() {
         }}
       />
 
+      {/* Create Cluster Modal */}
+      <CreateClusterModal
+        isOpen={isCreateClusterModalOpen}
+        onClose={() => setIsCreateClusterModalOpen(false)}
+        onCreate={(title, description, color) => {
+          const pos = clusterSpawnPos || screenToWorld(window.innerWidth / 2, window.innerHeight / 2);
+          addGroup(title, color, pos.x - 170, pos.y - 90, description);
+          showToast(`Created cluster "${title}"`, 'success');
+        }}
+      />
+
       {/* Color Meaning Modal */}
       <ColorMeaningModal
         isOpen={isColorMeaningOpen}
@@ -902,7 +914,7 @@ export function App() {
         state={contextMenu}
         onClose={() => setContextMenu((prev) => ({ ...prev, isOpen: false }))}
         onCreateNote={(color, x, y) => addNote({ color, x, y })}
-        onAddGroup={(x, y) => addGroup('New Section', 'blue', x, y)}
+        onAddGroup={(x, y) => handleOpenCreateCluster({ x, y })}
         onDuplicateNote={duplicateNote}
         onDeleteNote={deleteNote}
         onToggleStar={toggleStar}
