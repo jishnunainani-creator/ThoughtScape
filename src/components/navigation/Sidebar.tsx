@@ -188,7 +188,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <input
                 type="text"
                 autoFocus
-                placeholder="Name your space (e.g. DSA, College, Projects)..."
+                placeholder="Name your space (e.g. Science Revision, Work Projects, Travel)..."
                 value={newBoardName}
                 onChange={(e) => setNewBoardName(e.target.value)}
                 onKeyDown={(e) => {

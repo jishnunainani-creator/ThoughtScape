@@ -66,7 +66,7 @@ export const SnapshotsModal: React.FC<SnapshotsModalProps> = ({
               <input
                 type="text"
                 autoFocus
-                placeholder="e.g. Sept 11, 2026 — DSA Revision"
+                placeholder="e.g. Sept 11, 2026 — Science Board Revision"
                 value={snapshotName}
                 onChange={(e) => setSnapshotName(e.target.value)}
                 onKeyDown={(e) => {

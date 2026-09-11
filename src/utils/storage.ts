@@ -1,37 +1,53 @@
-import { WorkspaceData, NoteColor, Board } from '../types';
+import { WorkspaceData, NoteColor, Board, StickyNote, Group, Connection } from '../types';
+import { DEMO_LANDSCAPES } from '../constants/demoLandscapes';
 
-const STORAGE_KEY = 'thoughtscape_workspace_v2';
+const STORAGE_KEY = 'thoughtscape_workspace_v3';
+const FALLBACK_V2_KEY = 'thoughtscape_workspace_v2';
 const FALLBACK_WALL_KEY = 'wall_workspace_v2';
 const LEGACY_STORAGE_KEY = 'sticknotes_workspace_v1';
 const DB_NAME = 'ThoughtscapeLocalDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'workspace';
-const CURRENT_VERSION = 2;
+const CURRENT_VERSION = 3;
 
 export const DEFAULT_COLOR_MEANINGS: Record<NoteColor, string> = {
-  yellow: 'General Overview',
-  pink: 'Important & Urgent',
-  green: 'Completed / Solution',
-  blue: 'Concepts & Definitions',
-  purple: 'Questions & Doubts',
-  peach: 'Rules & Formulas',
-  orange: 'Ideas & Brainstorm',
+  yellow: 'Ideas / Things to Explore',
+  blue: 'Information / References',
+  green: 'Tasks / Plans',
+  pink: 'Important / Remember',
+  purple: 'Questions / Reflections',
+  peach: 'Personal Notes',
+  orange: 'Brainstorm / Creative',
   red: 'Mistakes / Pitfalls',
-  white: 'Neutral & Code',
+  white: 'Code & Neutral',
 };
 
-const DEFAULT_BOARD_ID = 'landscape_main_default';
+export const DEFAULT_BOARDS: Board[] = DEMO_LANDSCAPES.map((d) => d.board);
+export const DEFAULT_BOARD_ID = DEMO_LANDSCAPES[0].board.id; // 'landscape_welcome'
 
-const DEFAULT_BOARDS: Board[] = [
-  {
-    id: DEFAULT_BOARD_ID,
-    name: 'My Thoughtscape',
-    description: 'Primary visual thinking landscape',
-    isDefault: true,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  },
-];
+// Build initial sample notes, groups, and connections across all default demo landscapes
+const INITIAL_DEMO_NOTES: StickyNote[] = DEMO_LANDSCAPES.flatMap((d) =>
+  d.notes.map((n) => ({
+    ...n,
+    createdAt: 1726041600000,
+    updatedAt: 1726041600000,
+  }))
+);
+
+const INITIAL_DEMO_GROUPS: Group[] = DEMO_LANDSCAPES.flatMap((d) =>
+  d.groups.map((g) => ({
+    ...g,
+    createdAt: 1726041600000,
+    updatedAt: 1726041600000,
+  }))
+);
+
+const INITIAL_DEMO_CONNECTIONS: Connection[] = DEMO_LANDSCAPES.flatMap((d) =>
+  d.connections.map((c) => ({
+    ...c,
+    createdAt: 1726041600000,
+  }))
+);
 
 export const INITIAL_SAMPLE_WORKSPACE: WorkspaceData = {
   version: CURRENT_VERSION,
@@ -39,112 +55,16 @@ export const INITIAL_SAMPLE_WORKSPACE: WorkspaceData = {
   lastModified: Date.now(),
   boards: DEFAULT_BOARDS,
   activeBoardId: DEFAULT_BOARD_ID,
-  notes: [
-    {
-      id: 'welcome_thought_1',
-      boardId: DEFAULT_BOARD_ID,
-      title: 'Welcome to Thoughtscape 👋',
-      content: 'A landscape for your thoughts.\n\n• Click any thought to edit directly in-place\n• Drag to arrange thoughts across the space\n• Connect thoughts with relationship arrows\n• Cluster related concepts together\n\n[[Explore]] your new mental landscape!',
-      type: 'concept',
-      color: 'yellow',
-      x: 300,
-      y: 180,
-      width: 270,
-      height: 220,
-      rotation: -1.2,
-      zIndex: 1,
-      tags: ['welcome', 'getting-started'],
-      starred: true,
-      pinned: false,
-      learningState: 'understood',
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    },
-    {
-      id: 'welcome_thought_2',
-      boardId: DEFAULT_BOARD_ID,
-      title: 'Physical Stationery Metaphor 📌',
-      content: 'Click "+ Add Thought" in the bottom right or press "N" to place a thought!\n\nUse [[Thought Links]] to cross-reference concepts like [[Welcome to Thoughtscape 👋]].',
-      type: 'idea',
-      color: 'blue',
-      x: 630,
-      y: 180,
-      width: 260,
-      height: 210,
-      rotation: 1.8,
-      zIndex: 2,
-      tags: ['tips', 'hotkeys'],
-      starred: false,
-      pinned: false,
-      learningState: 'learning',
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    },
-    {
-      id: 'welcome_thought_3',
-      boardId: DEFAULT_BOARD_ID,
-      title: 'Explore Mode & Power Tools ⚡',
-      content: '• Infinite pan & zoom across your landscape\n• Command palette (Cmd + K)\n• Interactive Minimap\n• Multi-Landscape switching & Snapshots\n• Mistake journals & Code blocks\n• High-Res PNG & Multi-page PDF export',
-      type: 'task',
-      color: 'green',
-      x: 460,
-      y: 440,
-      width: 280,
-      height: 210,
-      rotation: -0.6,
-      zIndex: 3,
-      tags: ['features'],
-      starred: false,
-      pinned: false,
-      learningState: 'mastered',
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    },
-  ],
-  groups: [
-    {
-      id: 'welcome_cluster_1',
-      boardId: DEFAULT_BOARD_ID,
-      title: 'Getting Started Landscape',
-      description: 'Your initial visual thinking space',
-      color: 'blue',
-      x: 260,
-      y: 110,
-      width: 680,
-      height: 570,
-      collapsed: false,
-      locked: false,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    },
-  ],
-  connections: [
-    {
-      id: 'welcome_conn_1',
-      boardId: DEFAULT_BOARD_ID,
-      sourceId: 'welcome_thought_1',
-      targetId: 'welcome_thought_2',
-      type: 'arrow',
-      label: 'leads to',
-      createdAt: Date.now(),
-    },
-    {
-      id: 'welcome_conn_2',
-      boardId: DEFAULT_BOARD_ID,
-      sourceId: 'welcome_thought_2',
-      targetId: 'welcome_thought_3',
-      type: 'dashed',
-      label: 'explore',
-      createdAt: Date.now(),
-    },
-  ],
+  notes: INITIAL_DEMO_NOTES,
+  groups: INITIAL_DEMO_GROUPS,
+  connections: INITIAL_DEMO_CONNECTIONS,
   stacks: [],
   trash: [],
   snapshots: [],
   colorMeanings: DEFAULT_COLOR_MEANINGS,
   canvasTransform: {
-    x: 100,
-    y: 50,
+    x: 40,
+    y: 20,
     scale: 1,
   },
 };
@@ -171,16 +91,27 @@ function openIndexedDB(): Promise<IDBDatabase> {
 // Synchronous initial load with migration
 export function loadWorkspace(): WorkspaceData {
   try {
-    // 1. Check current Thoughtscape v2 storage key in localStorage
-    const rawV2 = localStorage.getItem(STORAGE_KEY);
-    if (rawV2) {
-      const parsed = JSON.parse(rawV2);
+    // 1. Check current Thoughtscape v3 storage key in localStorage
+    const rawV3 = localStorage.getItem(STORAGE_KEY);
+    if (rawV3) {
+      const parsed = JSON.parse(rawV3);
       if (parsed && typeof parsed === 'object') {
         return sanitizeWorkspaceData(parsed);
       }
     }
 
-    // 2. Check previous Wall v2 storage
+    // 2. Check previous v2 storage
+    const rawV2 = localStorage.getItem(FALLBACK_V2_KEY);
+    if (rawV2) {
+      const parsed = JSON.parse(rawV2);
+      if (parsed && typeof parsed === 'object') {
+        const migrated = sanitizeWorkspaceData(parsed);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+        return migrated;
+      }
+    }
+
+    // 3. Check previous Wall v2 storage
     const rawWall = localStorage.getItem(FALLBACK_WALL_KEY);
     if (rawWall) {
       const parsed = JSON.parse(rawWall);
@@ -191,13 +122,12 @@ export function loadWorkspace(): WorkspaceData {
       }
     }
 
-    // 3. Check legacy v1 storage
+    // 4. Check legacy v1 storage
     const rawV1 = localStorage.getItem(LEGACY_STORAGE_KEY);
     if (rawV1) {
       const parsed = JSON.parse(rawV1);
       if (parsed && typeof parsed === 'object') {
         const migrated = sanitizeWorkspaceData(parsed);
-        // Save to v2
         localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
         return migrated;
       }
@@ -212,14 +142,26 @@ export function loadWorkspace(): WorkspaceData {
 
 // Sanitize & migrate data
 export function sanitizeWorkspaceData(parsed: Partial<WorkspaceData>): WorkspaceData {
-  const boards: Board[] = Array.isArray(parsed.boards) && parsed.boards.length > 0
+  // If boards are missing or only contain the single legacy board, merge default demo boards
+  let boards: Board[] = Array.isArray(parsed.boards) && parsed.boards.length > 0
     ? parsed.boards
     : DEFAULT_BOARDS;
 
-  const activeBoardId = parsed.activeBoardId || boards[0]?.id || DEFAULT_BOARD_ID;
+  // Ensure default demo boards exist in the board list
+  const existingBoardIds = new Set(boards.map((b) => b.id));
+  const missingDemoBoards = DEFAULT_BOARDS.filter((db) => !existingBoardIds.has(db.id));
+  if (missingDemoBoards.length > 0) {
+    boards = [...boards, ...missingDemoBoards];
+  }
 
-  // Ensure every note has a boardId
-  const notes = (Array.isArray(parsed.notes) ? parsed.notes : []).map((n) => ({
+  // Active board ID
+  let activeBoardId = parsed.activeBoardId || boards[0]?.id || DEFAULT_BOARD_ID;
+  if (activeBoardId === 'landscape_main_default' || activeBoardId === 'board_default') {
+    activeBoardId = DEFAULT_BOARD_ID;
+  }
+
+  // Ensure every note has a valid boardId
+  let notes: StickyNote[] = (Array.isArray(parsed.notes) ? parsed.notes : []).map((n) => ({
     ...n,
     boardId: n.boardId || activeBoardId,
     tags: Array.isArray(n.tags) ? n.tags : [],
@@ -228,17 +170,47 @@ export function sanitizeWorkspaceData(parsed: Partial<WorkspaceData>): Workspace
     locked: Boolean(n.locked),
   }));
 
-  const groups = (Array.isArray(parsed.groups) ? parsed.groups : []).map((g) => ({
+  let groups: Group[] = (Array.isArray(parsed.groups) ? parsed.groups : []).map((g) => ({
     ...g,
     boardId: g.boardId || activeBoardId,
     collapsed: Boolean(g.collapsed),
     locked: Boolean(g.locked),
   }));
 
-  const connections = (Array.isArray(parsed.connections) ? parsed.connections : []).map((c) => ({
+  let connections: Connection[] = (Array.isArray(parsed.connections) ? parsed.connections : []).map((c) => ({
     ...c,
     boardId: c.boardId || activeBoardId,
   }));
+
+  // If notes on the default welcome board are empty or only the 3 legacy welcome notes, seed with universal demo notes
+  const welcomeNotes = notes.filter((n) => n.boardId === DEFAULT_BOARD_ID);
+  const isLegacyDemoOnly = welcomeNotes.length === 0 || 
+    (welcomeNotes.length <= 3 && welcomeNotes.some((n) => n.id.startsWith('welcome_thought_')));
+
+  if (isLegacyDemoOnly) {
+    // Filter out old legacy welcome notes and add new universal notes
+    const otherNotes = notes.filter((n) => n.boardId !== DEFAULT_BOARD_ID && !n.id.startsWith('welcome_thought_'));
+    const otherGroups = groups.filter((g) => g.boardId !== DEFAULT_BOARD_ID && !g.id.startsWith('welcome_cluster_'));
+    const otherConns = connections.filter((c) => c.boardId !== DEFAULT_BOARD_ID && !c.id.startsWith('welcome_conn_'));
+
+    // Re-seed demo content for demo boards that are currently empty
+    const demoNotesToSeed = INITIAL_DEMO_NOTES.filter((dn) => {
+      const hasNotesForBoard = otherNotes.some((on) => on.boardId === dn.boardId);
+      return dn.boardId === DEFAULT_BOARD_ID || !hasNotesForBoard;
+    });
+    const demoGroupsToSeed = INITIAL_DEMO_GROUPS.filter((dg) => {
+      const hasGroupsForBoard = otherGroups.some((og) => og.boardId === dg.boardId);
+      return dg.boardId === DEFAULT_BOARD_ID || !hasGroupsForBoard;
+    });
+    const demoConnsToSeed = INITIAL_DEMO_CONNECTIONS.filter((dc) => {
+      const hasConnsForBoard = otherConns.some((oc) => oc.boardId === dc.boardId);
+      return dc.boardId === DEFAULT_BOARD_ID || !hasConnsForBoard;
+    });
+
+    notes = [...otherNotes, ...demoNotesToSeed];
+    groups = [...otherGroups, ...demoGroupsToSeed];
+    connections = [...otherConns, ...demoConnsToSeed];
+  }
 
   const stacks = Array.isArray(parsed.stacks) ? parsed.stacks : [];
   const trash = Array.isArray(parsed.trash) ? parsed.trash : [];
@@ -256,8 +228,11 @@ export function sanitizeWorkspaceData(parsed: Partial<WorkspaceData>): Workspace
     stacks,
     trash,
     snapshots,
-    colorMeanings: parsed.colorMeanings || DEFAULT_COLOR_MEANINGS,
-    canvasTransform: parsed.canvasTransform || { x: 0, y: 0, scale: 1 },
+    colorMeanings: {
+      ...DEFAULT_COLOR_MEANINGS,
+      ...(parsed.colorMeanings || {}),
+    },
+    canvasTransform: parsed.canvasTransform || { x: 40, y: 20, scale: 1 },
   };
 }
 
@@ -295,6 +270,7 @@ export function saveWorkspace(data: WorkspaceData): boolean {
 
 export function resetWorkspace(): WorkspaceData {
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(FALLBACK_V2_KEY);
   localStorage.removeItem(FALLBACK_WALL_KEY);
   localStorage.removeItem(LEGACY_STORAGE_KEY);
   openIndexedDB().then((db) => {

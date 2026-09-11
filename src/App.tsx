@@ -474,6 +474,8 @@ export function App() {
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onOpenGuide={() => setIsHelpMenuOpen(true)}
         onFocusGroup={(gid) => setFocusedGroupId(gid)}
+        onOpenTemplates={() => setIsTemplatesOpen(true)}
+        onAddBoard={addBoard}
       />
 
       {/* Sidebar Explorer */}
@@ -857,6 +859,9 @@ export function App() {
         isOpen={tutorial.showWelcome}
         onStartTour={tutorial.startTour}
         onSkipTour={tutorial.skipTour}
+        onSelectLandscape={(boardId) => {
+          switchBoard(boardId);
+        }}
       />
 
       {/* Tutorial Completion Dialog */}

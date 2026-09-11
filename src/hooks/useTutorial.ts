@@ -61,15 +61,15 @@ export function useTutorial({
     const startY = window.innerHeight > 700 ? window.innerHeight / 2 - 150 : 250;
 
     // Demo Group
-    const group = addGroup('DSA Patterns 🧠', 'blue', startX - 40, startY - 60);
+    const group = addGroup('Learning & Ideas 🧠', 'blue', startX - 40, startY - 60);
     setDemoGroupId(group.id);
 
-    // Demo Note 1: Array
+    // Demo Note 1: Science Revision
     const note1 = addNote({
-      title: 'Array Data Structure 📦',
-      content: 'Contiguous memory block with O(1) indexed lookup.\n\nTry [[Two Pointers]] pattern for linear scans!',
+      title: 'Science Revision 📚',
+      content: 'Revise core principles and formulas.\n\nConnect to [[Board Exam Plan]] to track progress!',
       type: 'concept',
-      color: 'yellow',
+      color: 'blue',
       x: startX,
       y: startY,
       width: 240,
@@ -79,12 +79,12 @@ export function useTutorial({
       learningState: 'understood',
     });
 
-    // Demo Note 2: Two Pointers
+    // Demo Note 2: Board Exam Plan
     const note2 = addNote({
-      title: 'Two Pointers Pattern ⚡',
-      content: 'Uses left & right indices to solve array problems in O(N) time without extra memory.',
-      type: 'concept',
-      color: 'blue',
+      title: 'Board Exam Plan ⚡',
+      content: 'Finish Science revision → solve previous papers → review mistakes → final revision.',
+      type: 'task',
+      color: 'green',
       x: startX + 290,
       y: startY,
       width: 240,
@@ -94,7 +94,7 @@ export function useTutorial({
       learningState: 'learning',
     });
 
-    const conn = addConnection(note1.id, note2.id, 'arrow', 'optimizes');
+    const conn = addConnection(note1.id, note2.id, 'arrow', 'prepares for');
     if (conn) {
       setDemoConnectionId(conn.id);
     }

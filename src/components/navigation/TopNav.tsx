@@ -59,6 +59,8 @@ interface TopNavProps {
   onOpenShortcuts: () => void;
   onOpenGuide?: () => void;
   onFocusGroup?: (groupId: string | null) => void;
+  onOpenTemplates?: () => void;
+  onAddBoard?: (name: string) => void;
 }
 
 export const TopNav: React.FC<TopNavProps> = ({
@@ -88,6 +90,8 @@ export const TopNav: React.FC<TopNavProps> = ({
   onOpenShortcuts,
   onOpenGuide,
   onFocusGroup,
+  onOpenTemplates,
+  onAddBoard,
 }) => {
   const [showOrganizeMenu, setShowOrganizeMenu] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -228,16 +232,17 @@ export const TopNav: React.FC<TopNavProps> = ({
             title="Switch Thoughtscape Landscape"
           >
             <Layers className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-            <span className="truncate max-w-[130px] font-medium">{activeBoard?.name || 'My Thoughtscape'}</span>
+            <span className="truncate max-w-[150px] font-medium">{activeBoard?.name || 'Welcome to Thoughtscape'}</span>
             <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-colors" />
           </button>
 
           {showBoardMenu && (
-            <div className="absolute left-0 top-full mt-1.5 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50 text-xs flex flex-col animate-in zoom-in-95 duration-100">
-              <div className="px-3.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                MY LANDSCAPES
+            <div className="absolute left-0 top-full mt-1.5 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50 text-xs flex flex-col animate-in zoom-in-95 duration-100">
+              <div className="px-3.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                <span>MY LANDSCAPES</span>
+                <span className="text-slate-400 font-normal">{boards.length} spaces</span>
               </div>
-              <div className="max-h-60 overflow-y-auto py-0.5">
+              <div className="max-h-72 overflow-y-auto py-0.5 divide-y divide-slate-50">
                 {boards.map((b) => (
                   <button
                     key={b.id}
@@ -245,16 +250,55 @@ export const TopNav: React.FC<TopNavProps> = ({
                       onSwitchBoard(b.id);
                       setShowBoardMenu(false);
                     }}
-                    className={`w-full px-3.5 py-2 text-left transition-colors flex items-center justify-between ${
+                    className={`w-full px-3.5 py-2.5 text-left transition-colors flex items-start justify-between gap-2 ${
                       b.id === activeBoardId
-                        ? 'bg-blue-50 text-blue-700 font-semibold'
+                        ? 'bg-blue-50/80 text-blue-900'
                         : 'text-slate-700 hover:bg-slate-50'
                     }`}
                   >
-                    <span className="truncate">{b.name}</span>
-                    {b.id === activeBoardId && <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
+                    <div className="flex flex-col min-w-0">
+                      <span className={`truncate font-semibold ${b.id === activeBoardId ? 'text-blue-700' : 'text-slate-800'}`}>
+                        {b.name}
+                      </span>
+                      {b.description && (
+                        <span className="text-[10.5px] text-slate-400 truncate mt-0.5">
+                          {b.description}
+                        </span>
+                      )}
+                    </div>
+                    {b.id === activeBoardId && (
+                      <Check className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    )}
                   </button>
                 ))}
+              </div>
+
+              {/* Bottom Actions */}
+              <div className="p-1.5 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl space-y-1">
+                {onAddBoard && (
+                  <button
+                    onClick={() => {
+                      onAddBoard('New Landscape');
+                      setShowBoardMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-white text-slate-700 font-medium text-xs transition-colors border border-transparent hover:border-slate-200"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-blue-600" />
+                    <span>+ New Empty Landscape</span>
+                  </button>
+                )}
+                {onOpenTemplates && (
+                  <button
+                    onClick={() => {
+                      onOpenTemplates();
+                      setShowBoardMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-white text-slate-700 font-medium text-xs transition-colors border border-transparent hover:border-slate-200"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Explore Templates & Demos</span>
+                  </button>
+                )}
               </div>
             </div>
           )}

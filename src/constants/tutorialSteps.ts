@@ -91,7 +91,7 @@ export const TUTORIAL_STEPS: TutorialStepConfig[] = [
     totalSteps: 14,
     targetSelector: '[data-tutorial="note-demo-1-connect"]',
     title: 'Connect your thoughts',
-    description: 'Show how one idea relates to another.\n\nArray ➔ Two Pointers',
+    description: 'Show how one idea relates to another.\n\nScience Revision ➔ Board Exam Plan',
     placement: 'right',
   },
   {
@@ -100,7 +100,7 @@ export const TUTORIAL_STEPS: TutorialStepConfig[] = [
     totalSteps: 14,
     targetSelector: '[data-tutorial="group-demo"]',
     title: 'Create a landscape cluster',
-    description: 'Gather related thoughts into a larger conceptual area.\n\nFor example:\nDSA ├── Arrays ├── Hashing └── Sliding Window',
+    description: 'Gather related thoughts into a larger conceptual area.\n\nFor example:\nSchool ├── Science Revision ├── Exam Plan └── Mistakes',
     placement: 'top',
   },
   {
