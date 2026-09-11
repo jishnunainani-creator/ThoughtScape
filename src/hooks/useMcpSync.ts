@@ -7,6 +7,7 @@ interface UseMcpSyncProps {
   selectedGroupId: string | null;
   notes: StickyNote[];
   groups: Group[];
+  enabled?: boolean;
   onWorkspaceUpdate?: (data: WorkspaceData) => void;
   onShowToast?: (message: string, type: 'info' | 'success' | 'warning' | 'error') => void;
 }
@@ -24,6 +25,7 @@ export function useMcpSync({
   selectedGroupId,
   notes,
   groups,
+  enabled = true,
   onWorkspaceUpdate,
   onShowToast,
 }: UseMcpSyncProps) {
@@ -40,7 +42,7 @@ export function useMcpSync({
   const checkHealth = useCallback(async () => {
     try {
       const res = await fetch(`${serverUrl}/health`);
-      if (res.ok) {
+      if (res && res.ok) {
         setIsConnected(true);
         return true;
       }
@@ -50,30 +52,35 @@ export function useMcpSync({
     return false;
   }, [serverUrl]);
 
-  // 2. Report real-time UI selection context to MCP Server
+  // 2. Report real-time UI selection context to MCP Server (only if connected)
   useEffect(() => {
+    if (!enabled || !isConnected) return;
     const selectionKey = `${activeBoardId}:${selectedNoteId || ''}:${selectedGroupId || ''}`;
     if (selectionKey === lastReportedSelectionRef.current) return;
     lastReportedSelectionRef.current = selectionKey;
 
-    const selectedNote = notes.find((n) => n.id === selectedNoteId);
-    const selectedGroup = groups.find((g) => g.id === selectedGroupId);
+    try {
+      const selectedNote = notes.find((n) => n.id === selectedNoteId);
+      const selectedGroup = groups.find((g) => g.id === selectedGroupId);
 
-    fetch(`${serverUrl}/api/context`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        activeBoardId,
-        selectedNoteId,
-        selectedNoteTitle: selectedNote?.title,
-        selectedNoteContent: selectedNote?.content,
-        selectedGroupId,
-        selectedGroupTitle: selectedGroup?.title,
-      }),
-    }).catch(() => {
-      // Server not running, ignore gracefully
-    });
-  }, [activeBoardId, selectedNoteId, selectedGroupId, notes, groups, serverUrl]);
+      fetch(`${serverUrl}/api/context`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          activeBoardId,
+          selectedNoteId,
+          selectedNoteTitle: selectedNote?.title,
+          selectedNoteContent: selectedNote?.content,
+          selectedGroupId,
+          selectedGroupTitle: selectedGroup?.title,
+        }),
+      }).catch(() => {
+        // Server not running, ignore gracefully
+      });
+    } catch {
+      // Safe fallback
+    }
+  }, [activeBoardId, selectedNoteId, selectedGroupId, notes, groups, serverUrl, enabled, isConnected]);
 
   // 3. Connect to Server-Sent Events (SSE) stream for live updates
   const connectSse = useCallback(() => {
@@ -188,11 +195,13 @@ export function useMcpSync({
   }, [serverUrl, activeBoardId, notes, groups, onWorkspaceUpdate, onShowToast]);
 
   useEffect(() => {
+    if (!enabled) return;
+
     checkHealth();
     connectSse();
     const interval = setInterval(() => {
       checkHealth();
-    }, 4000);
+    }, 5000);
 
     return () => {
       clearInterval(interval);
@@ -200,7 +209,7 @@ export function useMcpSync({
         eventSourceRef.current.close();
       }
     };
-  }, [checkHealth, connectSse]);
+  }, [enabled, checkHealth, connectSse]);
 
   // Execute AI Prompt directly from UI
   const executeAiPrompt = useCallback(

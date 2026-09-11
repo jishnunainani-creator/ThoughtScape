@@ -74,7 +74,7 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({
       mcpServers: {
         thoughtscape: {
           command: 'node',
-          args: [`${process.env.PWD || '.'}/server/dist/index.js`],
+          args: ['./server/dist/index.js'],
         },
       },
     },
