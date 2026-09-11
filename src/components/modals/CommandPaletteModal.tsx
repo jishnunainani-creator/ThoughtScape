@@ -17,6 +17,7 @@ import {
   BookOpen,
   Palette,
   Bot,
+  Trash2,
 } from 'lucide-react';
 import { StickyNote, Board, NoteColor } from '../../types';
 import { COLOR_LIST, STICKY_COLORS } from '../../constants/colors';
@@ -52,6 +53,7 @@ interface CommandPaletteModalProps {
   onImportJSON: () => void;
   onOpenSnapshots: () => void;
   onOpenTemplates: () => void;
+  onOpenClearLandscape?: () => void;
   onOpenEnvironmentModal?: () => void;
   onOpenMcpModal?: () => void;
   onOpenShortcuts: () => void;
@@ -81,6 +83,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   onImportJSON,
   onOpenSnapshots,
   onOpenTemplates,
+  onOpenClearLandscape,
   onOpenEnvironmentModal,
   onOpenMcpModal,
   onOpenShortcuts,
@@ -198,6 +201,17 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       action: () => {
         onOrganize('flow');
         onClose();
+      },
+    },
+    {
+      id: 'clear-landscape',
+      title: 'Clear Landscape (Remove all thoughts & clusters)',
+      category: 'Organize',
+      icon: <Trash2 className="w-4 h-4 text-rose-500" />,
+      shortcut: '⌘⇧⌫',
+      action: () => {
+        onClose();
+        onOpenClearLandscape?.();
       },
     },
     {

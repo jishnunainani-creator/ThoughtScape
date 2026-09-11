@@ -21,6 +21,7 @@ import { EnvironmentModal } from './components/modals/EnvironmentModal';
 import { McpIntegrationModal } from './components/modals/McpIntegrationModal';
 import { FocusedThoughtModal } from './components/modals/FocusedThoughtModal';
 import { CreateClusterModal } from './components/modals/CreateClusterModal';
+import { ClearLandscapeModal } from './components/modals/ClearLandscapeModal';
 import { useMcpSync } from './hooks/useMcpSync';
 import { TutorialWelcomeModal } from './components/tutorial/TutorialWelcomeModal';
 import { TutorialFinishModal } from './components/tutorial/TutorialFinishModal';
@@ -102,6 +103,7 @@ export function App() {
     emptyTrash,
     loadTemplate,
     createTodayNotes,
+    clearLandscape,
     restoreWorkspace,
     undo,
     redo,
@@ -133,6 +135,7 @@ export function App() {
   const [isSnapshotsOpen, setIsSnapshotsOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
+  const [isClearLandscapeModalOpen, setIsClearLandscapeModalOpen] = useState(false);
   const [isCreateClusterModalOpen, setIsCreateClusterModalOpen] = useState(false);
   const [clusterSpawnPos, setClusterSpawnPos] = useState<{ x: number; y: number } | null>(null);
   const [isEnvironmentModalOpen, setIsEnvironmentModalOpen] = useState(false);
@@ -318,6 +321,9 @@ export function App() {
         showToast('Redone', 'info');
       }
     },
+    onClearLandscape: () => {
+      setIsClearLandscapeModalOpen(true);
+    },
     onCommandPalette: () => setIsCommandPaletteOpen(true),
     onSearch: () => setIsSearchOpen(true),
     onFitView: () => fitToNotes(notes),
@@ -337,6 +343,7 @@ export function App() {
       setIsSnapshotsOpen(false);
       setIsExportOpen(false);
       setIsTemplatesOpen(false);
+      setIsClearLandscapeModalOpen(false);
       setIsColorMeaningOpen(false);
       setIsShortcutsOpen(false);
       setIsEnvironmentModalOpen(false);
@@ -344,6 +351,26 @@ export function App() {
       setPreviewEnvironment(null);
     },
   });
+
+  const totalItemsInLandscape = notes.length + groups.length + connections.length;
+  const currentBoard = boards.find((b) => b.id === activeBoardId) || boards[0];
+
+  const handleClearLandscape = useCallback(() => {
+    if (totalItemsInLandscape === 0) {
+      showToast('Nothing to clear.', 'info');
+      return;
+    }
+    clearLandscape();
+    showToast('Landscape cleared', 'info', {
+      label: 'Undo',
+      onClick: () => {
+        if (canUndo) {
+          undo();
+          showToast('Landscape restored', 'success');
+        }
+      },
+    });
+  }, [totalItemsInLandscape, clearLandscape, showToast, canUndo, undo]);
 
   // Connection flow start / end
   const handleStartConnection = (sourceId: string) => {
@@ -458,6 +485,7 @@ export function App() {
         boards={boards}
         activeBoardId={activeBoardId}
         groups={groups}
+        totalItemsInLandscape={totalItemsInLandscape}
         canUndo={canUndo}
         canRedo={canRedo}
         saveStatus={saveStatus}
@@ -477,6 +505,7 @@ export function App() {
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         onOrganize={handleOrganize}
+        onOpenClearLandscape={() => setIsClearLandscapeModalOpen(true)}
         onTogglePresentation={() => setIsPresentationMode(!isPresentationMode)}
         onOpenExportModal={() => setIsExportOpen(true)}
         onExportJSON={handleExportJSON}
@@ -709,6 +738,7 @@ export function App() {
         onImportJSON={handleImportJSONClick}
         onOpenSnapshots={() => setIsSnapshotsOpen(true)}
         onOpenTemplates={() => setIsTemplatesOpen(true)}
+        onOpenClearLandscape={() => setIsClearLandscapeModalOpen(true)}
         onOpenEnvironmentModal={() => setIsEnvironmentModalOpen(true)}
         onOpenMcpModal={() => setIsMcpModalOpen(true)}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
@@ -913,6 +943,17 @@ export function App() {
           tutorial.resetTutorialProgress();
           showToast('Tutorial progress reset - starting tour', 'info');
         }}
+      />
+
+      {/* Clear Landscape Confirmation Modal */}
+      <ClearLandscapeModal
+        isOpen={isClearLandscapeModalOpen}
+        onClose={() => setIsClearLandscapeModalOpen(false)}
+        onConfirmClear={handleClearLandscape}
+        landscapeName={currentBoard?.name || 'Current Landscape'}
+        thoughtsCount={notes.length}
+        clustersCount={groups.length}
+        connectionsCount={connections.length}
       />
 
       {/* Context Menu */}

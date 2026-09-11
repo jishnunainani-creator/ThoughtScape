@@ -808,6 +808,50 @@ export function useStickyNotes() {
     [allNotes, allGroups, allConnections, activeBoardId, pushState]
   );
 
+  // Clear entire current landscape (undoable as a single transaction)
+  const clearLandscape = useCallback(
+    (boardId?: string) => {
+      const targetBoardId = boardId || activeBoardId;
+      const defaultBoardId = boards[0]?.id;
+
+      const remainingNotes = allNotes.filter(
+        (n) => (n.boardId || defaultBoardId) !== targetBoardId
+      );
+      const remainingGroups = allGroups.filter(
+        (g) => (g.boardId || defaultBoardId) !== targetBoardId
+      );
+      const remainingConnections = allConnections.filter(
+        (c) => (c.boardId || defaultBoardId) !== targetBoardId
+      );
+
+      const deletedThoughts = allNotes.length - remainingNotes.length;
+      const deletedClusters = allGroups.length - remainingGroups.length;
+      const deletedConnections = allConnections.length - remainingConnections.length;
+
+      // Push state atomically into history
+      pushState({
+        notes: remainingNotes,
+        groups: remainingGroups,
+        connections: remainingConnections,
+      });
+
+      // Clear selections
+      setSelectedNoteId(null);
+      setSelectedGroupId(null);
+      setSelectedConnectionId(null);
+      setSelectedStackId(null);
+      setFocusedGroupId(null);
+      setConnectingSourceId(null);
+
+      return {
+        deletedThoughts,
+        deletedClusters,
+        deletedConnections,
+      };
+    },
+    [allNotes, allGroups, allConnections, activeBoardId, boards, pushState]
+  );
+
   // Today session notes
   const createTodayNotes = useCallback(() => {
     const today = new Date().toLocaleDateString(undefined, {
@@ -992,6 +1036,7 @@ export function useStickyNotes() {
     emptyTrash,
     loadTemplate,
     createTodayNotes,
+    clearLandscape,
     restoreWorkspace,
     undo: undoHistory,
     redo: redoHistory,

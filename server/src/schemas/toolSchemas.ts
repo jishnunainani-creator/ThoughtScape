@@ -429,4 +429,22 @@ export const MCP_TOOLS: McpTool[] = [
       required: ['mode'],
     },
   },
+  {
+    name: 'clear_landscape',
+    description: 'Destructive operation: Clear all thoughts, clusters, and relationships from a specific landscape without deleting the landscape record itself. Requires explicit confirmation (confirm: true).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        landscapeId: {
+          type: 'string',
+          description: 'The target landscape ID to clear. If omitted, the active landscape is used.',
+        },
+        confirm: {
+          type: 'boolean',
+          description: 'Explicit safety confirmation. Must be strictly set to true to execute the destructive clear.',
+        },
+      },
+      required: ['confirm'],
+    },
+  },
 ];

@@ -21,10 +21,21 @@ export const ToastContainer: React.FC<ToastProps> = ({ toasts, onDismiss }) => {
           {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
           {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />}
           {toast.type === 'info' && <Info className="w-4 h-4 text-blue-400 shrink-0" />}
-          <span className="flex-1">{toast.message}</span>
+          <span className="flex-1 font-medium">{toast.message}</span>
+          {toast.action && (
+            <button
+              onClick={() => {
+                toast.action?.onClick();
+                onDismiss(toast.id);
+              }}
+              className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-[11px] font-bold rounded-lg shadow-sm transition-all shrink-0 cursor-pointer"
+            >
+              {toast.action.label}
+            </button>
+          )}
           <button
             onClick={() => onDismiss(toast.id)}
-            className="p-0.5 text-slate-400 hover:text-white transition-colors"
+            className="p-1 text-slate-400 hover:text-white rounded-md hover:bg-white/10 transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>

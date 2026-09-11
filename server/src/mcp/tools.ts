@@ -321,6 +321,32 @@ export class ToolDispatcher {
         };
       }
 
+      case 'clear_landscape': {
+        if (args.confirm !== true) {
+          throw new Error(
+            'Safety confirmation required: "confirm" parameter must be strictly set to true to clear all thoughts, clusters, and relationships from the landscape.'
+          );
+        }
+
+        const clearResult = this.boardService.clearLandscape(args.landscapeId);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(
+                {
+                  success: true,
+                  message: `Successfully cleared landscape "${clearResult.landscapeName}". Removed ${clearResult.deletedThoughts} thoughts, ${clearResult.deletedClusters} clusters, and ${clearResult.deletedConnections} connections.`,
+                  details: clearResult,
+                },
+                null,
+                2
+              ),
+            },
+          ],
+        };
+      }
+
       default:
         throw new Error(`Unknown MCP tool: "${name}"`);
     }

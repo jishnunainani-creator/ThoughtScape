@@ -4,7 +4,18 @@ import { EventEmitter } from 'node:events';
 import { WorkspaceData, Board } from '../types/index.js';
 
 export interface StorageChangeEvent {
-  type: 'note_created' | 'note_updated' | 'note_deleted' | 'group_created' | 'group_updated' | 'group_deleted' | 'connection_created' | 'connection_deleted' | 'thought_map_created' | 'workspace_synced';
+  type:
+    | 'note_created'
+    | 'note_updated'
+    | 'note_deleted'
+    | 'group_created'
+    | 'group_updated'
+    | 'group_deleted'
+    | 'connection_created'
+    | 'connection_deleted'
+    | 'thought_map_created'
+    | 'landscape_cleared'
+    | 'workspace_synced';
   landscapeId: string;
   data?: any;
   timestamp: number;

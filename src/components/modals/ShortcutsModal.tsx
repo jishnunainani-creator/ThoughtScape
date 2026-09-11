@@ -13,6 +13,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
     { key: 'N', desc: 'Create new sticky note at viewport center' },
     { key: '⌘ + ⇧ + N', desc: 'Quick capture sticky note' },
     { key: 'Delete / Backspace', desc: 'Delete selected note, section, or arrow' },
+    { key: '⌘ + ⇧ + Backspace', desc: 'Clear current landscape (with confirmation)' },
     { key: '⌘ + D', desc: 'Duplicate selected note' },
     { key: '⌘ + Z', desc: 'Undo last change' },
     { key: '⌘ + ⇧ + Z / ⌘ + Y', desc: 'Redo last undone change' },

@@ -25,6 +25,7 @@ import {
   Check,
   AlignHorizontalDistributeCenter,
   AlignVerticalDistributeCenter,
+  Trash2,
 } from 'lucide-react';
 import { OrganizeMode } from '../../utils/layout';
 import { isSoundEnabled, toggleSound } from '../../utils/sound';
@@ -35,6 +36,7 @@ interface TopNavProps {
   boards: Board[];
   activeBoardId: string;
   groups: Group[];
+  totalItemsInLandscape?: number;
   canUndo: boolean;
   canRedo: boolean;
   saveStatus: 'saved' | 'saving';
@@ -51,6 +53,7 @@ interface TopNavProps {
   onOpenCommandPalette: () => void;
   onToggleSidebar: () => void;
   onOrganize: (mode: OrganizeMode) => void;
+  onOpenClearLandscape?: () => void;
   onTogglePresentation: () => void;
   onOpenExportModal: () => void;
   onExportJSON: () => void;
@@ -67,6 +70,7 @@ export const TopNav: React.FC<TopNavProps> = ({
   boards,
   activeBoardId,
   groups,
+  totalItemsInLandscape,
   canUndo,
   canRedo,
   saveStatus,
@@ -82,6 +86,7 @@ export const TopNav: React.FC<TopNavProps> = ({
   onOpenCommandPalette,
   onToggleSidebar,
   onOrganize,
+  onOpenClearLandscape,
   onTogglePresentation,
   onOpenExportModal,
   onExportJSON,
@@ -299,6 +304,22 @@ export const TopNav: React.FC<TopNavProps> = ({
                     <span>Explore Templates & Demos</span>
                   </button>
                 )}
+                {onOpenClearLandscape && (
+                  <button
+                    onClick={() => {
+                      if ((totalItemsInLandscape ?? 1) > 0) {
+                        onOpenClearLandscape();
+                        setShowBoardMenu(false);
+                      }
+                    }}
+                    disabled={(totalItemsInLandscape ?? 1) === 0}
+                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-rose-50 text-slate-600 hover:text-rose-700 font-medium text-xs transition-colors border border-transparent hover:border-rose-100 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-slate-600 cursor-pointer disabled:cursor-not-allowed"
+                    title={(totalItemsInLandscape ?? 1) === 0 ? 'Nothing to clear in this landscape' : 'Clear all thoughts, clusters and relationships from this landscape'}
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Clear Landscape</span>
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -462,6 +483,23 @@ export const TopNav: React.FC<TopNavProps> = ({
               >
                 <AlignVerticalDistributeCenter className="w-3.5 h-3.5 text-slate-400" />
                 <span>Align Vertically</span>
+              </button>
+
+              <div className="h-px bg-slate-100 my-1" />
+
+              <button
+                onClick={() => {
+                  if (onOpenClearLandscape && (totalItemsInLandscape ?? 1) > 0) {
+                    onOpenClearLandscape();
+                    setShowOrganizeMenu(false);
+                  }
+                }}
+                disabled={(totalItemsInLandscape ?? 1) === 0}
+                className="flex items-center gap-2.5 px-3.5 py-2 hover:bg-rose-50 text-slate-700 hover:text-rose-700 text-left transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-slate-700 cursor-pointer disabled:cursor-not-allowed"
+                title={(totalItemsInLandscape ?? 1) === 0 ? 'Nothing to clear in this landscape' : 'Clear all thoughts, clusters and relationships from this landscape'}
+              >
+                <Trash2 className="w-3.5 h-3.5 text-slate-400" />
+                <span>Clear Landscape</span>
               </button>
             </div>
           )}

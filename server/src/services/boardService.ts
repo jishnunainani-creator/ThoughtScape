@@ -67,4 +67,51 @@ export class BoardService {
     this.storage.scheduleSave();
     return newBoard;
   }
+
+  public clearLandscape(landscapeId?: string): {
+    success: boolean;
+    landscapeId: string;
+    landscapeName: string;
+    deletedThoughts: number;
+    deletedClusters: number;
+    deletedConnections: number;
+  } {
+    const ws = this.storage.getWorkspace();
+    const board = this.storage.resolveLandscape(landscapeId);
+    const targetId = board.id;
+
+    const initialNoteCount = ws.notes.length;
+    const initialGroupCount = ws.groups.length;
+    const initialConnCount = ws.connections.length;
+
+    ws.notes = ws.notes.filter((n) => (n.boardId || ws.activeBoardId) !== targetId);
+    ws.groups = ws.groups.filter((g) => (g.boardId || ws.activeBoardId) !== targetId);
+    ws.connections = ws.connections.filter((c) => (c.boardId || ws.activeBoardId) !== targetId);
+
+    const deletedThoughts = initialNoteCount - ws.notes.length;
+    const deletedClusters = initialGroupCount - ws.groups.length;
+    const deletedConnections = initialConnCount - ws.connections.length;
+
+    this.storage.scheduleSave();
+    this.storage.emitChange({
+      type: 'landscape_cleared',
+      landscapeId: targetId,
+      data: {
+        deletedThoughts,
+        deletedClusters,
+        deletedConnections,
+      },
+      timestamp: Date.now(),
+    });
+
+    return {
+      success: true,
+      landscapeId: targetId,
+      landscapeName: board.name,
+      deletedThoughts,
+      deletedClusters,
+      deletedConnections,
+    };
+  }
 }
+

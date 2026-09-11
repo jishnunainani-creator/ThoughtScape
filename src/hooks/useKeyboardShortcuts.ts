@@ -15,6 +15,7 @@ export interface ShortcutHandlers {
   onZoomOut?: () => void;
   onEscape?: () => void;
   onSelectAll?: () => void;
+  onClearLandscape?: () => void;
 }
 
 export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
@@ -44,6 +45,13 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
       if (cmdOrCtrl && e.shiftKey && e.key.toLowerCase() === 'n') {
         e.preventDefault();
         handlers.onQuickCapture?.();
+        return;
+      }
+
+      // Clear Landscape: Cmd+Shift+Backspace / Cmd+Shift+Delete
+      if (cmdOrCtrl && e.shiftKey && (e.key === 'Backspace' || e.key === 'Delete')) {
+        e.preventDefault();
+        handlers.onClearLandscape?.();
         return;
       }
 
