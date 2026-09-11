@@ -21,6 +21,7 @@ import {
   ChevronRight,
   BookOpen,
   Palette,
+  Bot,
 } from 'lucide-react';
 import { OrganizeMode } from '../../utils/layout';
 import { isSoundEnabled, toggleSound } from '../../utils/sound';
@@ -36,7 +37,9 @@ interface TopNavProps {
   saveStatus: 'saved' | 'saving';
   isPresentationMode: boolean;
   activeEnvironmentName?: string;
+  isMcpConnected?: boolean;
   onOpenEnvironmentModal?: () => void;
+  onOpenMcpModal?: () => void;
   onSwitchBoard: (boardId: string) => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -63,7 +66,9 @@ export const TopNav: React.FC<TopNavProps> = ({
   saveStatus,
   isPresentationMode,
   activeEnvironmentName,
+  isMcpConnected = false,
   onOpenEnvironmentModal,
+  onOpenMcpModal,
   onSwitchBoard,
   onUndo,
   onRedo,
@@ -266,6 +271,27 @@ export const TopNav: React.FC<TopNavProps> = ({
           >
             <Palette className="w-3.5 h-3.5 text-blue-600" />
             <span className="hidden lg:inline">{activeEnvironmentName || 'Environment'}</span>
+          </button>
+        )}
+
+        {/* ChatGPT / MCP AI Bridge Button */}
+        {onOpenMcpModal && (
+          <button
+            onClick={onOpenMcpModal}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all border shadow-2xs ${
+              isMcpConnected
+                ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200/70'
+                : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+            }`}
+            title="ChatGPT & MCP Integration Settings"
+          >
+            <Bot className={`w-3.5 h-3.5 ${isMcpConnected ? 'text-emerald-600' : 'text-blue-600'}`} />
+            <span className="hidden md:inline">AI Bridge</span>
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                isMcpConnected ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+              }`}
+            />
           </button>
         )}
 

@@ -16,6 +16,7 @@ import {
   Share2,
   BookOpen,
   Palette,
+  Bot,
 } from 'lucide-react';
 import { StickyNote, Board, NoteColor } from '../../types';
 import { COLOR_LIST, STICKY_COLORS } from '../../constants/colors';
@@ -52,6 +53,7 @@ interface CommandPaletteModalProps {
   onOpenSnapshots: () => void;
   onOpenTemplates: () => void;
   onOpenEnvironmentModal?: () => void;
+  onOpenMcpModal?: () => void;
   onOpenShortcuts: () => void;
   onOpenGuide?: () => void;
   onSwitchBoard: (boardId: string) => void;
@@ -80,6 +82,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   onOpenSnapshots,
   onOpenTemplates,
   onOpenEnvironmentModal,
+  onOpenMcpModal,
   onOpenShortcuts,
   onOpenGuide,
   onSwitchBoard,
@@ -267,6 +270,16 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       action: () => {
         onClose();
         if (onOpenEnvironmentModal) onOpenEnvironmentModal();
+      },
+    },
+    {
+      id: 'mcp-integration',
+      title: 'ChatGPT & MCP Agent Integration Settings',
+      category: 'Export & Data',
+      icon: <Bot className="w-4 h-4 text-emerald-600" />,
+      action: () => {
+        onClose();
+        if (onOpenMcpModal) onOpenMcpModal();
       },
     },
     {

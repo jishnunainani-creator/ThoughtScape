@@ -18,6 +18,8 @@ import { ColorMeaningModal } from './components/modals/ColorMeaningModal';
 import { ShortcutsModal } from './components/modals/ShortcutsModal';
 import { TechnicalGuideModal } from './components/modals/TechnicalGuideModal';
 import { EnvironmentModal } from './components/modals/EnvironmentModal';
+import { McpIntegrationModal } from './components/modals/McpIntegrationModal';
+import { useMcpSync } from './hooks/useMcpSync';
 import { TutorialWelcomeModal } from './components/tutorial/TutorialWelcomeModal';
 import { TutorialFinishModal } from './components/tutorial/TutorialFinishModal';
 import { TutorialSpotlight } from './components/tutorial/TutorialSpotlight';
@@ -130,6 +132,7 @@ export function App() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
   const [isEnvironmentModalOpen, setIsEnvironmentModalOpen] = useState(false);
+  const [isMcpModalOpen, setIsMcpModalOpen] = useState(false);
   const [previewEnvironment, setPreviewEnvironment] = useState<EnvironmentDefinition | null>(null);
   const [isColorMeaningOpen, setIsColorMeaningOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
@@ -197,6 +200,26 @@ export function App() {
     },
     []
   );
+
+  // Real-time MCP Server Sync & Live ChatGPT Bridge
+  const {
+    isConnected: isMcpConnected,
+    serverUrl: mcpServerUrl,
+    activityLogs: mcpActivityLogs,
+    reconnect: reconnectMcp,
+  } = useMcpSync({
+    activeBoardId,
+    selectedNoteId,
+    selectedGroupId,
+    notes,
+    groups,
+    onWorkspaceUpdate: (incomingData) => {
+      restoreWorkspace(incomingData);
+    },
+    onShowToast: (msg, type) => {
+      showToast(msg, type);
+    },
+  });
 
   // Filtered Notes
   const displayedNotes = notes.filter((n) => {
@@ -302,6 +325,7 @@ export function App() {
       setIsColorMeaningOpen(false);
       setIsShortcutsOpen(false);
       setIsEnvironmentModalOpen(false);
+      setIsMcpModalOpen(false);
       setPreviewEnvironment(null);
     },
   });
@@ -424,7 +448,9 @@ export function App() {
         saveStatus={saveStatus}
         isPresentationMode={isPresentationMode}
         activeEnvironmentName={activeEnvironment.name}
+        isMcpConnected={isMcpConnected}
         onOpenEnvironmentModal={() => setIsEnvironmentModalOpen(true)}
+        onOpenMcpModal={() => setIsMcpModalOpen(true)}
         onSwitchBoard={switchBoard}
         onUndo={undo}
         onRedo={redo}
@@ -670,6 +696,7 @@ export function App() {
         onOpenSnapshots={() => setIsSnapshotsOpen(true)}
         onOpenTemplates={() => setIsTemplatesOpen(true)}
         onOpenEnvironmentModal={() => setIsEnvironmentModalOpen(true)}
+        onOpenMcpModal={() => setIsMcpModalOpen(true)}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onOpenGuide={() => setIsHelpMenuOpen(true)}
         onSwitchBoard={switchBoard}
@@ -701,6 +728,16 @@ export function App() {
         isOpen={isExportOpen}
         onClose={() => setIsExportOpen(false)}
         canvasLayerElement={document.getElementById('knowledge-canvas-layer')}
+      />
+
+      {/* ChatGPT & MCP Integration Modal */}
+      <McpIntegrationModal
+        isOpen={isMcpModalOpen}
+        onClose={() => setIsMcpModalOpen(false)}
+        isConnected={isMcpConnected}
+        serverUrl={mcpServerUrl}
+        activityLogs={mcpActivityLogs}
+        onReconnect={reconnectMcp}
       />
 
       {/* Environment Personalization Modal */}
