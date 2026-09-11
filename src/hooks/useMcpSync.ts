@@ -29,12 +29,28 @@ export function useMcpSync({
 }: UseMcpSyncProps) {
   const [isConnected, setIsConnected] = useState(false);
   const [activityLogs, setActivityLogs] = useState<McpActivityLog[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
   const lastReportedSelectionRef = useRef<string>('');
+  const hasInitializedServerRef = useRef(false);
 
   const serverUrl = 'http://localhost:3001';
 
-  // 1. Report real-time UI selection context to MCP Server
+  // 1. Check health / connection actively
+  const checkHealth = useCallback(async () => {
+    try {
+      const res = await fetch(`${serverUrl}/health`);
+      if (res.ok) {
+        setIsConnected(true);
+        return true;
+      }
+    } catch {
+      setIsConnected(false);
+    }
+    return false;
+  }, [serverUrl]);
+
+  // 2. Report real-time UI selection context to MCP Server
   useEffect(() => {
     const selectionKey = `${activeBoardId}:${selectedNoteId || ''}:${selectedGroupId || ''}`;
     if (selectionKey === lastReportedSelectionRef.current) return;
@@ -57,9 +73,9 @@ export function useMcpSync({
     }).catch(() => {
       // Server not running, ignore gracefully
     });
-  }, [activeBoardId, selectedNoteId, selectedGroupId, notes, groups]);
+  }, [activeBoardId, selectedNoteId, selectedGroupId, notes, groups, serverUrl]);
 
-  // 2. Connect to Server-Sent Events (SSE) stream for live updates
+  // 3. Connect to Server-Sent Events (SSE) stream for live updates
   const connectSse = useCallback(() => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
@@ -71,11 +87,37 @@ export function useMcpSync({
 
       es.onopen = () => {
         setIsConnected(true);
+
+        // On first connection, initialize server if server is empty but browser has notes
+        if (!hasInitializedServerRef.current) {
+          hasInitializedServerRef.current = true;
+          fetch(`${serverUrl}/api/workspace`)
+            .then((r) => r.json())
+            .then((serverWs: WorkspaceData) => {
+              if (serverWs && serverWs.notes && serverWs.notes.length === 0 && notes.length > 0) {
+                // Seed server with current browser workspace
+                fetch(`${serverUrl}/api/workspace`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    version: 2,
+                    appName: 'Thoughtscape',
+                    lastModified: Date.now(),
+                    boards: [{ id: activeBoardId, name: 'My Thoughtscape', createdAt: Date.now(), updatedAt: Date.now() }],
+                    activeBoardId,
+                    notes,
+                    groups,
+                    connections: [],
+                  }),
+                }).catch(() => {});
+              }
+            })
+            .catch(() => {});
+        }
       };
 
       es.onerror = () => {
         setIsConnected(false);
-        es.close();
       };
 
       es.addEventListener('thoughtscape:update', (e: MessageEvent) => {
@@ -95,7 +137,7 @@ export function useMcpSync({
 
             if (onShowToast) {
               onShowToast(
-                `✨ ChatGPT created concept map for "${mapData.topic}" (${mapData.notes.length} thoughts, ${mapData.groups.length} clusters)`,
+                `✨ AI Bridge created concept map for "${mapData.topic}" (${mapData.notes.length} thoughts, ${mapData.groups.length} clusters)`,
                 'success'
               );
             }
@@ -112,7 +154,7 @@ export function useMcpSync({
             ].slice(0, 20));
 
             if (onShowToast) {
-              onShowToast(`✨ ChatGPT added thought "${note.title || 'New Thought'}"`, 'info');
+              onShowToast(`✨ AI Bridge added thought "${note.title || 'New Thought'}"`, 'info');
             }
           } else if (type === 'connection_created') {
             const conn = event.data;
@@ -143,15 +185,14 @@ export function useMcpSync({
     } catch {
       setIsConnected(false);
     }
-  }, [onWorkspaceUpdate, onShowToast]);
+  }, [serverUrl, activeBoardId, notes, groups, onWorkspaceUpdate, onShowToast]);
 
   useEffect(() => {
+    checkHealth();
     connectSse();
     const interval = setInterval(() => {
-      if (!isConnected) {
-        connectSse();
-      }
-    }, 5000);
+      checkHealth();
+    }, 4000);
 
     return () => {
       clearInterval(interval);
@@ -159,24 +200,58 @@ export function useMcpSync({
         eventSourceRef.current.close();
       }
     };
-  }, [connectSse, isConnected]);
+  }, [checkHealth, connectSse]);
 
-  // Push local changes to server when local actions occur
-  const syncLocalWorkspaceToServer = useCallback((workspaceData: WorkspaceData) => {
-    fetch(`${serverUrl}/api/workspace`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(workspaceData),
-    }).catch(() => {
-      // Background sync, silently fail if server offline
-    });
-  }, []);
+  // Execute AI Prompt directly from UI
+  const executeAiPrompt = useCallback(
+    async (topic: string, mapType = 'concept', detailLevel = 'detailed', userInstructions = '') => {
+      if (!topic.trim()) return;
+      setIsGenerating(true);
+      try {
+        const res = await fetch(`${serverUrl}/api/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            landscapeId: activeBoardId,
+            topic: topic.trim(),
+            mapType,
+            detailLevel,
+            userInstructions,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (onShowToast) {
+            onShowToast(`✨ Generated concept map for "${topic}"!`, 'success');
+          }
+          // Fetch updated workspace
+          const wsRes = await fetch(`${serverUrl}/api/workspace`);
+          const wsData = await wsRes.json();
+          if (onWorkspaceUpdate && wsData.boards) {
+            onWorkspaceUpdate(wsData);
+          }
+        } else {
+          if (onShowToast) {
+            onShowToast(data.error || 'Failed to generate concept map', 'error');
+          }
+        }
+      } catch (err: any) {
+        if (onShowToast) {
+          onShowToast(`Failed to connect to MCP server: ${err?.message || 'Server offline'}`, 'error');
+        }
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [serverUrl, activeBoardId, onWorkspaceUpdate, onShowToast]
+  );
 
   return {
     isConnected,
     serverUrl,
     activityLogs,
+    isGenerating,
     reconnect: connectSse,
-    syncLocalWorkspaceToServer,
+    executeAiPrompt,
   };
 }

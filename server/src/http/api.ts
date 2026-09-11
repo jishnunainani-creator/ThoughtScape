@@ -6,6 +6,7 @@ export class HttpBridgeServer {
   private server: http.Server | null = null;
   private sseClients: Set<http.ServerResponse> = new Set();
   private dispatcher: ToolDispatcher;
+  private heartbeatInterval: NodeJS.Timeout | null = null;
 
   constructor(private storage: StorageProvider, private port = 3001) {
     this.dispatcher = new ToolDispatcher(storage);
@@ -14,18 +15,27 @@ export class HttpBridgeServer {
     this.storage.on('change', (event) => {
       this.broadcastSse('thoughtscape:update', event);
     });
+
+    // Send heartbeat every 15 seconds to keep SSE connections open
+    this.heartbeatInterval = setInterval(() => {
+      this.sendHeartbeat();
+    }, 15000);
   }
 
   public start(): Promise<number> {
     return new Promise((resolve) => {
       this.server = http.createServer((req, res) => {
-        // Enable CORS
+        // Global CORS Headers
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
 
         if (req.method === 'OPTIONS') {
-          res.writeHead(204);
+          res.writeHead(204, {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+          });
           res.end();
           return;
         }
@@ -35,7 +45,10 @@ export class HttpBridgeServer {
 
         // 1. Health check
         if (pathname === '/health' || pathname === '/api/status') {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          });
           res.end(
             JSON.stringify({
               status: 'ok',
@@ -53,7 +66,8 @@ export class HttpBridgeServer {
           res.writeHead(200, {
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache, no-transform',
-            Connection: 'keep-alive',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
           });
 
           res.write('data: {"type":"connected","message":"Connected to Thoughtscape MCP Bridge"}\n\n');
@@ -68,7 +82,10 @@ export class HttpBridgeServer {
         // 3. Workspace Fetch & Sync
         if (pathname === '/api/workspace') {
           if (req.method === 'GET') {
-            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.writeHead(200, {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            });
             res.end(JSON.stringify(this.storage.getWorkspace()));
             return;
           }
@@ -77,10 +94,16 @@ export class HttpBridgeServer {
             this.parseJsonBody(req, res, (body) => {
               if (body && Array.isArray(body.boards)) {
                 this.storage.setWorkspace(body, false);
-                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.writeHead(200, {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                });
                 res.end(JSON.stringify({ success: true, message: 'Workspace synced' }));
               } else {
-                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.writeHead(400, {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                });
                 res.end(JSON.stringify({ error: 'Invalid workspace payload' }));
               }
             });
@@ -92,18 +115,53 @@ export class HttpBridgeServer {
         if (pathname === '/api/context' && req.method === 'POST') {
           this.parseJsonBody(req, res, (body) => {
             this.dispatcher.contextService.updateContext(body || {});
-            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.writeHead(200, {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            });
             res.end(JSON.stringify({ success: true }));
           });
           return;
         }
 
-        // 5. HTTP MCP Tool Call Bridge
+        // 5. In-App Quick Prompt Execution (/api/generate)
+        if (pathname === '/api/generate' && req.method === 'POST') {
+          this.parseJsonBody(req, res, async (body) => {
+            try {
+              const { topic, mapType, detailLevel, userInstructions, landscapeId } = body || {};
+              if (!topic) {
+                res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+                res.end(JSON.stringify({ error: 'Missing topic parameter' }));
+                return;
+              }
+
+              const result = this.dispatcher.thoughtMapService.createThoughtMap({
+                landscapeId,
+                topic,
+                mapType: mapType || 'concept',
+                detailLevel: detailLevel || 'detailed',
+                userInstructions,
+              });
+
+              res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+              res.end(JSON.stringify({ success: true, result }));
+            } catch (err: any) {
+              res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+              res.end(JSON.stringify({ error: err?.message || 'Failed to generate concept map' }));
+            }
+          });
+          return;
+        }
+
+        // 6. HTTP MCP Tool Call Bridge
         if ((pathname === '/mcp' || pathname === '/api/mcp') && req.method === 'POST') {
           this.parseJsonBody(req, res, async (body) => {
             try {
               if (body.method === 'tools/list') {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.writeHead(200, {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                });
                 res.end(JSON.stringify({ jsonrpc: '2.0', id: body.id, result: { tools: this.dispatcher.listTools() } }));
                 return;
               }
@@ -111,15 +169,24 @@ export class HttpBridgeServer {
               if (body.method === 'tools/call') {
                 const { name, arguments: args } = body.params || {};
                 const result = await this.dispatcher.callTool(name, args || {});
-                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.writeHead(200, {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                });
                 res.end(JSON.stringify({ jsonrpc: '2.0', id: body.id, result }));
                 return;
               }
 
-              res.writeHead(400, { 'Content-Type': 'application/json' });
+              res.writeHead(400, {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+              });
               res.end(JSON.stringify({ jsonrpc: '2.0', id: body.id, error: { code: -32601, message: 'Method not supported over HTTP endpoint' } }));
             } catch (err: any) {
-              res.writeHead(500, { 'Content-Type': 'application/json' });
+              res.writeHead(500, {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+              });
               res.end(JSON.stringify({ jsonrpc: '2.0', id: body.id, error: { code: -32000, message: err?.message || 'Execution error' } }));
             }
           });
@@ -127,7 +194,10 @@ export class HttpBridgeServer {
         }
 
         // 404
-        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.writeHead(404, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        });
         res.end(JSON.stringify({ error: 'Not found' }));
       });
 
@@ -136,6 +206,16 @@ export class HttpBridgeServer {
         resolve(this.port);
       });
     });
+  }
+
+  private sendHeartbeat(): void {
+    for (const client of this.sseClients) {
+      try {
+        client.write(': keepalive\n\n');
+      } catch {
+        this.sseClients.delete(client);
+      }
+    }
   }
 
   private broadcastSse(eventType: string, data: any): void {
@@ -159,7 +239,10 @@ export class HttpBridgeServer {
         const parsed = raw ? JSON.parse(raw) : {};
         next(parsed);
       } catch (err) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.writeHead(400, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        });
         res.end(JSON.stringify({ error: 'Malformed JSON body' }));
       }
     });

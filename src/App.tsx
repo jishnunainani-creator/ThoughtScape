@@ -206,6 +206,8 @@ export function App() {
     isConnected: isMcpConnected,
     serverUrl: mcpServerUrl,
     activityLogs: mcpActivityLogs,
+    isGenerating: isAiGenerating,
+    executeAiPrompt,
     reconnect: reconnectMcp,
   } = useMcpSync({
     activeBoardId,
@@ -738,6 +740,8 @@ export function App() {
         serverUrl={mcpServerUrl}
         activityLogs={mcpActivityLogs}
         onReconnect={reconnectMcp}
+        onExecuteAiPrompt={executeAiPrompt}
+        isGenerating={isAiGenerating}
       />
 
       {/* Environment Personalization Modal */}

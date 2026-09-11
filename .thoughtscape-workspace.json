@@ -1,0 +1,168 @@
+{
+  "version": 2,
+  "appName": "Thoughtscape",
+  "lastModified": 1789119662834,
+  "boards": [
+    {
+      "id": "landscape_main_default",
+      "name": "My Thoughtscape",
+      "createdAt": 1789119662832,
+      "updatedAt": 1789119662832
+    }
+  ],
+  "activeBoardId": "landscape_main_default",
+  "notes": [
+    {
+      "title": "Two Pointers Pattern",
+      "content": "Used on sorted arrays or palindromes.\n• Opposite ends (e.g. 2Sum II)\n• Fast & Slow pointer (Cycle detection)\n• Sliding Window derivation",
+      "type": "concept",
+      "color": "blue",
+      "x": 100,
+      "y": 100,
+      "width": 210,
+      "height": 180,
+      "rotation": -0.8,
+      "zIndex": 1,
+      "tags": [
+        "dsa",
+        "patterns"
+      ],
+      "starred": true,
+      "pinned": false,
+      "id": "note_1788874863433_0",
+      "createdAt": 1788874863433,
+      "updatedAt": 1789107595023,
+      "boardId": "landscape_main_default",
+      "locked": false
+    },
+    {
+      "title": "Sliding Window",
+      "content": "Maintains a sub-segment state.\n• Fixed size window (Sum of K items)\n• Dynamic size (Longest substring with K distinct chars)\n• Shrink condition check",
+      "type": "concept",
+      "color": "yellow",
+      "x": 400,
+      "y": 100,
+      "width": 210,
+      "height": 180,
+      "rotation": -0.8,
+      "zIndex": 2,
+      "tags": [
+        "dsa",
+        "window"
+      ],
+      "starred": false,
+      "pinned": false,
+      "id": "note_1788874863433_1",
+      "createdAt": 1788874863433,
+      "updatedAt": 1789109333477,
+      "boardId": "landscape_main_default",
+      "locked": false
+    },
+    {
+      "title": "Binary Search On Answer",
+      "content": "When search space is monotonic: F F F T T T.\nFind first True condition.\n`mid = left + (right-left)//2`",
+      "type": "code",
+      "color": "purple",
+      "x": 700,
+      "y": 100,
+      "width": 210,
+      "height": 180,
+      "rotation": -0.8,
+      "zIndex": 3,
+      "tags": [
+        "binarysearch"
+      ],
+      "starred": true,
+      "pinned": false,
+      "id": "note_1788874863433_2",
+      "createdAt": 1788874863433,
+      "updatedAt": 1789106919500,
+      "boardId": "landscape_main_default",
+      "locked": false
+    },
+    {
+      "title": "Arrays & Dynamic Arrays",
+      "content": "O(1) access by index.\nAmortized O(1) append.\nContiguous memory allocation.",
+      "type": "normal",
+      "color": "green",
+      "x": 1000,
+      "y": 100,
+      "width": 210,
+      "height": 170,
+      "rotation": -0.8,
+      "zIndex": 4,
+      "tags": [
+        "array"
+      ],
+      "starred": false,
+      "pinned": false,
+      "id": "note_1788874863433_3",
+      "createdAt": 1788874863433,
+      "updatedAt": 1789106919500,
+      "boardId": "landscape_main_default",
+      "locked": false
+    },
+    {
+      "title": "Hash Maps & Sets",
+      "content": "O(1) average lookup, insert, delete.\nHandle collisions via chaining or open addressing.\nCheck edge cases with empty keys.",
+      "type": "normal",
+      "color": "peach",
+      "x": 1300,
+      "y": 100,
+      "width": 210,
+      "height": 170,
+      "rotation": -0.8,
+      "zIndex": 1,
+      "tags": [
+        "hashmap"
+      ],
+      "starred": false,
+      "pinned": false,
+      "id": "note_1788874863433_4",
+      "createdAt": 1788874863433,
+      "updatedAt": 1789106919500,
+      "boardId": "landscape_main_default",
+      "locked": false
+    },
+    {
+      "title": "Common Mistake Checklist",
+      "content": "• Index out of bounds (off by one)\n• Unhandled empty input []\n• Integer overflow on mid calc\n• Infinite loop in while(left <= right)",
+      "type": "task",
+      "color": "red",
+      "x": 1600,
+      "y": 100,
+      "width": 210,
+      "height": 170,
+      "rotation": -0.8,
+      "zIndex": 6,
+      "tags": [
+        "pitfalls"
+      ],
+      "starred": true,
+      "pinned": false,
+      "id": "note_1788874863433_5",
+      "createdAt": 1788874863433,
+      "updatedAt": 1789106919500,
+      "boardId": "landscape_main_default",
+      "locked": false
+    }
+  ],
+  "groups": [
+    {
+      "title": "Data Structures Reference",
+      "description": "Fundamental storage mechanisms",
+      "color": "green",
+      "x": 289,
+      "y": 356,
+      "width": 780,
+      "height": 380,
+      "collapsed": false,
+      "id": "group_1788874863433_1",
+      "createdAt": 1788874863433,
+      "updatedAt": 1789106938482,
+      "boardId": "landscape_main_default",
+      "locked": false
+    }
+  ],
+  "connections": []
+}

@@ -9,6 +9,9 @@ import {
   ShieldCheck,
   Cpu,
   RefreshCw,
+  Zap,
+  Play,
+  Layers,
 } from 'lucide-react';
 import { McpActivityLog } from '../../hooks/useMcpSync';
 
@@ -19,6 +22,13 @@ interface McpIntegrationModalProps {
   serverUrl: string;
   activityLogs: McpActivityLog[];
   onReconnect: () => void;
+  onExecuteAiPrompt?: (
+    topic: string,
+    mapType?: 'concept-map' | 'mindmap' | 'hierarchy' | 'flowchart',
+    detailLevel?: 'overview' | 'standard' | 'detailed',
+    instructions?: string
+  ) => Promise<void>;
+  isGenerating?: boolean;
 }
 
 export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({
@@ -28,8 +38,13 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({
   serverUrl,
   activityLogs,
   onReconnect,
+  onExecuteAiPrompt,
+  isGenerating = false,
 }) => {
-  const [activeTab, setActiveTab] = useState<'setup' | 'tools' | 'activity'>('setup');
+  const [activeTab, setActiveTab] = useState<'prompt' | 'setup' | 'tools' | 'activity'>('prompt');
+  const [promptTopic, setPromptTopic] = useState('');
+  const [mapType, setMapType] = useState<'concept-map' | 'mindmap' | 'hierarchy' | 'flowchart'>('concept-map');
+  const [detailLevel, setDetailLevel] = useState<'overview' | 'standard' | 'detailed'>('standard');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -39,6 +54,20 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
   };
+
+  const handleGenerate = async (topicToUse?: string) => {
+    const targetTopic = (topicToUse || promptTopic).trim();
+    if (!targetTopic || !onExecuteAiPrompt || isGenerating) return;
+    await onExecuteAiPrompt(targetTopic, mapType, detailLevel);
+  };
+
+  const quickTopics = [
+    { title: 'Binary Search', desc: 'Algorithm, Complexity & Variants' },
+    { title: 'Dynamic Programming', desc: 'Memoization, Tabulation & Problems' },
+    { title: 'Microservices Architecture', desc: 'Patterns, Resiliency & APIs' },
+    { title: 'React Component Lifecycle', desc: 'Hooks, Mount & State Updates' },
+    { title: 'Machine Learning Pipelines', desc: 'ETL, Training, Inference & Eval' },
+  ];
 
   const claudeConfig = JSON.stringify(
     {
@@ -130,7 +159,7 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-sm">
               <Bot className="w-5 h-5" />
             </div>
             <div>
@@ -168,6 +197,18 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({
         {/* Tab Navigation */}
         <div className="flex items-center gap-2 px-6 pt-3 border-b border-slate-100 bg-white">
           <button
+            onClick={() => setActiveTab('prompt')}
+            className={`pb-2.5 px-2 text-xs font-semibold border-b-2 transition-all flex items-center gap-1.5 ${
+              activeTab === 'prompt'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Generate Concept Map</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('setup')}
             className={`pb-2.5 px-2 text-xs font-semibold border-b-2 transition-all flex items-center gap-1.5 ${
               activeTab === 'setup'
@@ -199,13 +240,159 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Zap className="w-3.5 h-3.5" />
             <span>Live Activity {activityLogs.length > 0 && `(${activityLogs.length})`}</span>
           </button>
         </div>
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-5 text-xs text-slate-700 flex-1">
+          {activeTab === 'prompt' && (
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-purple-50/40 border border-blue-100/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                      ✨
+                    </span>
+                    <span className="font-bold text-sm text-slate-900">
+                      AI Concept Map Engine
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-blue-700 bg-blue-100/70 font-medium px-2 py-0.5 rounded-full">
+                    Direct Bridge / MCP Native
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Enter any topic or concept. Thoughtscape will synthesize ideas, color-code categories, form semantic clusters, and draw interconnected relationship arrows onto your active landscape.
+                </p>
+
+                {/* Topic Input */}
+                <div className="space-y-2 pt-1">
+                  <label className="font-semibold text-xs text-slate-800 block">
+                    What topic would you like to map out?
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={promptTopic}
+                      onChange={(e) => setPromptTopic(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !isGenerating) {
+                          handleGenerate();
+                        }
+                      }}
+                      placeholder="e.g. Binary Search, Microservices, React State Management..."
+                      className="flex-1 px-3.5 py-2.5 bg-white rounded-xl border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 shadow-2xs font-medium"
+                    />
+                    <button
+                      onClick={() => handleGenerate()}
+                      disabled={!promptTopic.trim() || isGenerating}
+                      className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 shrink-0 active:scale-98"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Generating...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                          <span>Generate</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Options (Map Type & Detail Level) */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
+                      <Layers className="w-3 h-3 text-slate-400" />
+                      <span>Layout / Structure</span>
+                    </label>
+                    <select
+                      value={mapType}
+                      onChange={(e) => setMapType(e.target.value as any)}
+                      className="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-300 text-[11px] text-slate-700 font-medium focus:outline-hidden focus:border-blue-500"
+                    >
+                      <option value="concept-map">Concept Map (Relational Nodes)</option>
+                      <option value="mindmap">Mind Map (Radial Hierarchy)</option>
+                      <option value="flowchart">Flowchart (Sequential)</option>
+                      <option value="hierarchy">Strict Hierarchy</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-slate-400" />
+                      <span>Detail Level</span>
+                    </label>
+                    <select
+                      value={detailLevel}
+                      onChange={(e) => setDetailLevel(e.target.value as any)}
+                      className="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-300 text-[11px] text-slate-700 font-medium focus:outline-hidden focus:border-blue-500"
+                    >
+                      <option value="standard">Standard (5-7 key notes + groups)</option>
+                      <option value="detailed">Comprehensive (Deep breakdown)</option>
+                      <option value="overview">Executive Overview (High-level)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Topics */}
+              <div className="space-y-2">
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Or pick a pre-curated topic:
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {quickTopics.map((item) => (
+                    <button
+                      key={item.title}
+                      onClick={() => {
+                        setPromptTopic(item.title);
+                        handleGenerate(item.title);
+                      }}
+                      disabled={isGenerating}
+                      className="text-left p-2.5 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-blue-50/70 hover:border-blue-200 transition-all group flex items-start justify-between"
+                    >
+                      <div>
+                        <div className="font-semibold text-slate-800 text-xs group-hover:text-blue-700 transition-colors">
+                          {item.title}
+                        </div>
+                        <div className="text-[11px] text-slate-400">{item.desc}</div>
+                      </div>
+                      <span className="text-[10px] text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity font-medium mt-0.5">
+                        Build →
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {!isConnected && (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs text-amber-800">
+                  <span>
+                    MCP Bridge is currently offline. Start the server with{' '}
+                    <code className="bg-amber-100/80 px-1 py-0.5 rounded font-mono text-[11px]">
+                      npm run server
+                    </code>{' '}
+                    to enable instant generation.
+                  </span>
+                  <button
+                    onClick={onReconnect}
+                    className="px-2 py-1 bg-amber-600 text-white rounded-lg text-[11px] font-semibold hover:bg-amber-700 transition-colors shrink-0 ml-2"
+                  >
+                    Check Server
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {activeTab === 'setup' && (
             <div className="space-y-4">
               {/* How it works banner */}
