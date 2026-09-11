@@ -15,6 +15,7 @@ import {
   Layers,
   GraduationCap,
   Clipboard,
+  Maximize2,
 } from 'lucide-react';
 
 interface NoteToolbarProps {
@@ -34,6 +35,7 @@ interface NoteToolbarProps {
   onBringToFront: () => void;
   onSendToBack: () => void;
   onCopyText: () => void;
+  onFocusNote?: () => void;
 }
 
 export const NoteToolbar: React.FC<NoteToolbarProps> = ({
@@ -53,6 +55,7 @@ export const NoteToolbar: React.FC<NoteToolbarProps> = ({
   onBringToFront,
   onSendToBack,
   onCopyText,
+  onFocusNote,
 }) => {
   const [showTypeMenu, setShowTypeMenu] = useState(false);
   const [showLearningMenu, setShowLearningMenu] = useState(false);
@@ -222,6 +225,17 @@ export const NoteToolbar: React.FC<NoteToolbarProps> = ({
       >
         <Copy className="w-3.5 h-3.5" />
       </button>
+
+      {/* Focus Thought */}
+      {onFocusNote && (
+        <button
+          onClick={onFocusNote}
+          className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition-colors"
+          title="Focus Thought (Expand Note)"
+        >
+          <Maximize2 className="w-3.5 h-3.5" />
+        </button>
+      )}
 
       {/* More Options Dropdown */}
       <div className="relative">

@@ -19,6 +19,7 @@ import { ShortcutsModal } from './components/modals/ShortcutsModal';
 import { TechnicalGuideModal } from './components/modals/TechnicalGuideModal';
 import { EnvironmentModal } from './components/modals/EnvironmentModal';
 import { McpIntegrationModal } from './components/modals/McpIntegrationModal';
+import { FocusedThoughtModal } from './components/modals/FocusedThoughtModal';
 import { useMcpSync } from './hooks/useMcpSync';
 import { TutorialWelcomeModal } from './components/tutorial/TutorialWelcomeModal';
 import { TutorialFinishModal } from './components/tutorial/TutorialFinishModal';
@@ -133,6 +134,7 @@ export function App() {
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
   const [isEnvironmentModalOpen, setIsEnvironmentModalOpen] = useState(false);
   const [isMcpModalOpen, setIsMcpModalOpen] = useState(false);
+  const [focusedThoughtId, setFocusedThoughtId] = useState<string | null>(null);
   const [previewEnvironment, setPreviewEnvironment] = useState<EnvironmentDefinition | null>(null);
   const [isColorMeaningOpen, setIsColorMeaningOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
@@ -598,6 +600,7 @@ export function App() {
         onTakeOneFromStack={takeOneFromStack}
         onDisbandStack={disbandStack}
         onNavigateToNote={handleNavigateToNote}
+        onFocusNote={(id) => setFocusedThoughtId(id)}
         onOpenContextMenu={handleOpenContextMenu}
         onCreateNote={(color) => {
           const centerWorld = screenToWorld(window.innerWidth / 2, window.innerHeight / 2);
@@ -746,6 +749,21 @@ export function App() {
         onReconnect={reconnectMcp}
         onExecuteAiPrompt={executeAiPrompt}
         isGenerating={isAiGenerating}
+      />
+
+      {/* Focused Thought Modal (Paper Magnify Experience) */}
+      <FocusedThoughtModal
+        note={notes.find((n) => n.id === focusedThoughtId) || null}
+        allNotes={notes}
+        isOpen={!!focusedThoughtId}
+        canvasTransform={transform}
+        onClose={() => setFocusedThoughtId(null)}
+        onUpdateNote={(id, updates, commit) => updateNote(id, updates, commit)}
+        onDeleteNote={(id) => deleteNote(id)}
+        onDuplicateNote={(id) => duplicateNote(id)}
+        onNavigateToNote={handleNavigateToNote}
+        onSwitchFocusedNote={(id) => setFocusedThoughtId(id)}
+        onOpenAiModal={() => setIsMcpModalOpen(true)}
       />
 
       {/* Environment Personalization Modal */}

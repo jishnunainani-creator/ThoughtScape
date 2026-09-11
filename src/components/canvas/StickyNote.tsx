@@ -12,6 +12,7 @@ import {
   Check,
   Quote as QuoteIcon,
   ArrowUpRight,
+  Maximize2,
 } from 'lucide-react';
 import { playDropSound } from '../../utils/sound';
 
@@ -27,6 +28,7 @@ interface StickyNoteProps {
   onUpdate: (updates: Partial<StickyNoteType>, commitHistory?: boolean) => void;
   onStartConnection: () => void;
   onNavigateToNote?: (targetTitleOrId: string) => void;
+  onFocusNote?: () => void;
 }
 
 export const StickyNote: React.FC<StickyNoteProps> = ({
@@ -41,6 +43,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
   onUpdate,
   onStartConnection,
   onNavigateToNote,
+  onFocusNote,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -394,6 +397,19 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
               <Pin className="w-3 h-3 fill-current inline" />
             </span>
           )}
+          {onFocusNote && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onFocusNote();
+              }}
+              aria-label="Focus thought"
+              title="Focus thought (Expand)"
+              className="p-1 rounded-sm hover:bg-black/10 text-slate-500 hover:text-slate-800 transition-colors opacity-0 group-hover/note:opacity-100 focus:opacity-100"
+            >
+              <Maximize2 className="w-3 h-3" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -534,7 +550,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
             </button>
           </div>
         ) : (
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col justify-between">
             {isEditingContent || note.content.includes('[[') === false ? (
               <textarea
                 value={note.content}
@@ -554,6 +570,21 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
               >
                 {renderContentWithWikiLinks(note.content || 'Click to edit thought...')}
               </div>
+            )}
+
+            {/* Read more indicator for longer notes */}
+            {onFocusNote && (note.content || '').length > 110 && !isEditingContent && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onFocusNote();
+                }}
+                className="text-[10px] text-slate-500 hover:text-blue-700 font-medium self-end flex items-center gap-0.5 mt-0.5 opacity-70 hover:opacity-100 transition-all group-hover/note:opacity-100"
+                title="Open in Focus Mode"
+              >
+                <span>more</span>
+                <ArrowUpRight className="w-2.5 h-2.5" />
+              </button>
             )}
           </div>
         )}

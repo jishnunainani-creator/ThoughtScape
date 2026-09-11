@@ -67,6 +67,7 @@ interface CanvasProps {
   onTakeOneFromStack: (stackId: string) => void;
   onDisbandStack: (stackId: string) => void;
   onNavigateToNote: (titleOrId: string) => void;
+  onFocusNote?: (noteId: string) => void;
   onOpenContextMenu: (
     e: React.MouseEvent,
     type: 'canvas' | 'note' | 'group' | 'stack',
@@ -128,6 +129,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   onTakeOneFromStack,
   onDisbandStack,
   onNavigateToNote,
+  onFocusNote,
   onOpenContextMenu,
   onCreateNote,
   onOpenTemplates,
@@ -357,6 +359,7 @@ export const Canvas: React.FC<CanvasProps> = ({
                 onUpdate={(updates, commit) => onUpdateNote(note.id, updates, commit)}
                 onStartConnection={() => onStartConnection(note.id)}
                 onNavigateToNote={onNavigateToNote}
+                onFocusNote={() => onFocusNote && onFocusNote(note.id)}
               />
             </div>
           );
@@ -382,6 +385,7 @@ export const Canvas: React.FC<CanvasProps> = ({
           onBringToFront={() => onBringToFront(selectedNote.id)}
           onSendToBack={() => onSendToBack(selectedNote.id)}
           onCopyText={() => onCopyNoteText(selectedNote.id)}
+          onFocusNote={() => onFocusNote && onFocusNote(selectedNote.id)}
         />
       )}
 
