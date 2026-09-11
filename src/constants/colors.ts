@@ -1,0 +1,117 @@
+import { NoteColor, ColorMeaning } from '../types';
+
+export const STICKY_COLORS: Record<NoteColor, ColorMeaning> = {
+  yellow: {
+    color: 'yellow',
+    name: 'Classic Yellow',
+    label: 'General & Overview',
+    bgClass: 'bg-[#FFF9C4]',
+    borderClass: 'border-[#FEE570]',
+    hex: '#FFF9C4',
+    borderHex: '#FDD835',
+  },
+  pink: {
+    color: 'pink',
+    name: 'Soft Pink',
+    label: 'Important & Urgent',
+    bgClass: 'bg-[#FCE4EC]',
+    borderClass: 'border-[#F8BBD0]',
+    hex: '#FCE4EC',
+    borderHex: '#F06292',
+  },
+  green: {
+    color: 'green',
+    name: 'Mint Green',
+    label: 'Completed / Solution',
+    bgClass: 'bg-[#E8F5E9]',
+    borderClass: 'border-[#C8E6C9]',
+    hex: '#E8F5E9',
+    borderHex: '#81C784',
+  },
+  blue: {
+    color: 'blue',
+    name: 'Sky Blue',
+    label: 'Concepts & Definitions',
+    bgClass: 'bg-[#E1F5FE]',
+    borderClass: 'border-[#B3E5FC]',
+    hex: '#E1F5FE',
+    borderHex: '#4FC3F7',
+  },
+  purple: {
+    color: 'purple',
+    name: 'Lavender',
+    label: 'Questions & Doubts',
+    bgClass: 'bg-[#F3E5F5]',
+    borderClass: 'border-[#E1BEE7]',
+    hex: '#F3E5F5',
+    borderHex: '#BA68C8',
+  },
+  peach: {
+    color: 'peach',
+    name: 'Peach',
+    label: 'Formulas & Rules',
+    bgClass: 'bg-[#FFE0B2]',
+    borderClass: 'border-[#FFCC80]',
+    hex: '#FFE0B2',
+    borderHex: '#FFB74D',
+  },
+  orange: {
+    color: 'orange',
+    name: 'Tangerine',
+    label: 'Ideas & Brainstorm',
+    bgClass: 'bg-[#FFECB3]',
+    borderClass: 'border-[#FFE082]',
+    hex: '#FFECB3',
+    borderHex: '#FFD54F',
+  },
+  red: {
+    color: 'red',
+    name: 'Light Coral',
+    label: 'Needs Attention / Danger',
+    bgClass: 'bg-[#FFEBEE]',
+    borderClass: 'border-[#FFCDD2]',
+    hex: '#FFEBEE',
+    borderHex: '#E57373',
+  },
+  white: {
+    color: 'white',
+    name: 'Pale Linen',
+    label: 'Neutral Notes & Code',
+    bgClass: 'bg-[#FAFAFA]',
+    borderClass: 'border-[#E0E0E0]',
+    hex: '#FAFAFA',
+    borderHex: '#BDBDBD',
+  },
+};
+
+export const COLOR_LIST: NoteColor[] = [
+  'yellow',
+  'pink',
+  'green',
+  'blue',
+  'purple',
+  'peach',
+  'orange',
+  'red',
+  'white',
+];
+
+export const NOTE_TYPE_INFO = {
+  normal: { label: 'Note', icon: 'FileText', badge: null, desc: 'Standard sticky note' },
+  concept: { label: 'Concept', icon: 'BookOpen', badge: '📖', desc: 'Definition, rule, or mental model' },
+  question: { label: 'Question', icon: 'HelpCircle', badge: '❓', desc: 'Question or unresolved doubt' },
+  idea: { label: 'Idea', icon: 'Lightbulb', badge: '💡', desc: 'Creative thought or insight' },
+  code: { label: 'Code', icon: 'Code', badge: '💻', desc: 'Syntax, snippet, or algorithm' },
+  task: { label: 'Task', icon: 'CheckSquare', badge: '☑️', desc: 'Actionable checklist items' },
+  mistake: { label: 'Mistake', icon: 'AlertTriangle', badge: '⚠️', desc: 'What went wrong & correct approach' },
+  reference: { label: 'Reference', icon: 'Link2', badge: '🔗', desc: 'External link, book, or source' },
+  quote: { label: 'Quote', icon: 'Quote', badge: '❝', desc: 'Important quotation or passage' },
+};
+
+export const LEARNING_STATE_INFO = {
+  new: { label: 'New', color: '#94A3B8', bg: '#F1F5F9' },
+  learning: { label: 'Learning', color: '#3B82F6', bg: '#EFF6FF' },
+  understood: { label: 'Understood', color: '#10B981', bg: '#ECFDF5' },
+  practicing: { label: 'Practicing', color: '#F59E0B', bg: '#FFFBEB' },
+  mastered: { label: 'Mastered', color: '#8B5CF6', bg: '#F5F3FF' },
+};

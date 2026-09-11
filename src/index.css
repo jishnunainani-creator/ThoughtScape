@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-primary: #2563EB;
+  --brand-primary-hover: #1D4ED8;
+  --brand-primary-soft: #EFF6FF;
+
+  --canvas: #FAF9F6;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --border: #E2E8F0;
+
+  --note-yellow: #FEF08A;
+  --note-pink: #FBCFE8;
+  --note-blue: #BAE6FD;
+  --note-green: #BBF7D0;
+  --note-purple: #DDD6FE;
+  --note-orange: #FED7AA;
+  --note-red: #FECACA;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Physical Peeling Note Pull Animation - Smooth, elegant stationery lift */
+@keyframes peelPullAndPlace {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.96);
+    opacity: 0.92;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  }
+  40% {
+    transform: translate3d(-35px, -50px, 0) rotate(-2.5deg) scale(1.03);
+    opacity: 1;
+    box-shadow: 0 16px 24px -4px rgba(0, 0, 0, 0.15), 0 6px 10px -4px rgba(0, 0, 0, 0.08);
+  }
+  100% {
+    transform: translate3d(-180px, -150px, 0) rotate(-1deg) scale(1);
+    opacity: 0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.animate-peel-and-fly {
+  animation: peelPullAndPlace 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Note Landing Settle - Gentle, elegant paper placement without shaking */
+@keyframes noteLandSpring {
+  0% {
+    transform: translateY(-8px) scale(1.02);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-note-land {
+  animation: noteLandSpring 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Fold-away Paper Delete Animation */
+@keyframes paperFoldAway {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.85) rotate(-3deg) translateY(-8px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(0.3) rotate(4deg) translateY(30px);
+    opacity: 0;
+  }
+}
+
+.animate-paper-delete {
+  animation: paperFoldAway 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+/* Paper Corner Curl Texture */
+.paper-curl-corner {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.08) 50%);
+  border-bottom-right-radius: 2px;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-peel-and-fly,
+  .animate-note-land,
+  .animate-paper-delete {
+    animation: none !important;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Subtle selection color */
+::selection {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
