@@ -1,5 +1,6 @@
 import { StorageProvider } from '../storage/storageProvider.js';
 import { LayoutService } from './layoutService.js';
+import { globalKnowledgeEngine } from './knowledgeEngine.js';
 import {
   StickyNote,
   Group,
@@ -43,7 +44,12 @@ export class ThoughtMapService {
     let connections: MapConnectionSpec[] = params.connections || [];
 
     if (thoughts.length === 0) {
-      const generated = this.generateDefaultTopicMap(params.topic.trim(), params.mapType, params.detailLevel, params.userInstructions);
+      const generated = globalKnowledgeEngine.generateTopicMap(
+        params.topic.trim(),
+        params.mapType,
+        params.detailLevel,
+        params.userInstructions
+      );
       thoughts = generated.thoughts;
       clusters = generated.clusters;
       connections = generated.connections;
@@ -205,124 +211,5 @@ export class ThoughtMapService {
       }
     });
   }
-
-  /**
-   * Generates a high-quality initial structured map if the AI or user provided a topic prompt.
-   */
-  private generateDefaultTopicMap(
-    topic: string,
-    mapType = 'concept',
-    detailLevel = 'detailed',
-    userInstructions?: string
-  ): {
-    thoughts: MapThoughtSpec[];
-    clusters: MapClusterSpec[];
-    connections: MapConnectionSpec[];
-  } {
-    const thoughts: MapThoughtSpec[] = [
-      {
-        tempId: 'main_concept',
-        title: topic,
-        content: `**Core Definition**\nCentral concept and mental model for understanding ${topic}.\n\n*Key takeaway*: Form the foundation before exploring variants.`,
-        type: 'concept',
-        color: 'yellow',
-        role: 'main',
-        clusterTempId: 'cluster_core',
-      },
-      {
-        tempId: 'prereq_1',
-        title: `${topic} Prerequisites`,
-        content: `Foundational knowledge and data representation required to grasp ${topic}.\n\n- Invariants\n- Base conditions\n- Assumptions`,
-        type: 'reference',
-        color: 'blue',
-        role: 'prerequisite',
-        clusterTempId: 'cluster_core',
-      },
-      {
-        tempId: 'mech_1',
-        title: 'Core Mechanism & Flow',
-        content: `Step-by-step logic execution:\n\n1. Initialize pointers/boundaries\n2. Iterate while condition holds\n3. Calculate midpoint/decision\n4. Narrow search space`,
-        type: 'concept',
-        color: 'green',
-        role: 'mechanism',
-        clusterTempId: 'cluster_core',
-      },
-      {
-        tempId: 'app_1',
-        title: 'Common Patterns & Applications',
-        content: `Where ${topic} appears in practice:\n\n- Finding peak elements\n- Range queries\n- Optimization over monotonic functions`,
-        type: 'action',
-        color: 'orange',
-        role: 'application',
-        clusterTempId: 'cluster_applications',
-      },
-      {
-        tempId: 'example_1',
-        title: 'Edge Cases & Pitfalls',
-        content: `Watch out for:\n\n⚠️ Integer overflow in midpoint calculation\n⚠️ Infinite loop on boundary updates\n⚠️ Single-element collections`,
-        type: 'warning',
-        color: 'pink',
-        role: 'example',
-        clusterTempId: 'cluster_applications',
-      },
-      {
-        tempId: 'quiz_1',
-        title: 'Self-Check Question',
-        content: `*Question*: Why is the array sorted invariant necessary for this algorithm?\n\n*Hint*: What happens to the monotonic property if unsorted?`,
-        type: 'question',
-        color: 'purple',
-        role: 'question',
-      },
-    ];
-
-    const clusters: MapClusterSpec[] = [
-      {
-        tempId: 'cluster_core',
-        title: `${topic} — Core Fundamentals`,
-        description: 'Mental models and execution mechanics',
-        color: 'blue',
-      },
-      {
-        tempId: 'cluster_applications',
-        title: 'Patterns & Practical Applications',
-        description: 'Real-world problem solving patterns',
-        color: 'orange',
-      },
-    ];
-
-    const connections: MapConnectionSpec[] = [
-      {
-        sourceTempId: 'prereq_1',
-        targetTempId: 'main_concept',
-        type: 'arrow',
-        label: 'foundation for',
-      },
-      {
-        sourceTempId: 'main_concept',
-        targetTempId: 'mech_1',
-        type: 'arrow',
-        label: 'executes via',
-      },
-      {
-        sourceTempId: 'mech_1',
-        targetTempId: 'app_1',
-        type: 'arrow',
-        label: 'applies to',
-      },
-      {
-        sourceTempId: 'main_concept',
-        targetTempId: 'example_1',
-        type: 'dashed',
-        label: 'edge cases',
-      },
-      {
-        sourceTempId: 'main_concept',
-        targetTempId: 'quiz_1',
-        type: 'step',
-        label: 'test understanding',
-      },
-    ];
-
-    return { thoughts, clusters, connections };
-  }
 }
+

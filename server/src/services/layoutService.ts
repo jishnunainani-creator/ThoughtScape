@@ -22,10 +22,117 @@ export class LayoutService {
   ): LayoutResult {
     const noteWidth = 260;
     const noteHeight = 210;
+
+    // If clusters exist, use cluster-first structured layout
+    if (clusters.length > 0) {
+      const clusterPaddingX = 24;
+      const clusterPaddingY = 20;
+      const headerH = 54;
+      const noteGapX = 20;
+      const noteGapY = 20;
+      const clusterGapX = 60;
+      const clusterGapY = 60;
+
+      // Determine grid configuration for clusters
+      const totalClusters = clusters.length;
+      const gridCols = totalClusters <= 2 ? totalClusters : totalClusters <= 4 ? 2 : 3;
+
+      // First pass: compute each cluster's dimensions
+      const clusterDims = clusters.map((c) => {
+        const memberThoughts = thoughts.filter((t) => t.clusterTempId === c.tempId);
+        const count = memberThoughts.length;
+        const innerCols = count >= 2 ? 2 : 1;
+        const innerRows = Math.max(1, Math.ceil(count / innerCols));
+        const width = clusterPaddingX * 2 + innerCols * noteWidth + (innerCols - 1) * noteGapX;
+        const height = headerH + clusterPaddingY + innerRows * noteHeight + (innerRows - 1) * noteGapY + clusterPaddingY;
+        return {
+          cluster: c,
+          members: memberThoughts,
+          innerCols,
+          innerRows,
+          width,
+          height,
+        };
+      });
+
+      // Calculate row heights and col widths
+      const colWidths: number[] = new Array(gridCols).fill(0);
+      const rowHeights: number[] = [];
+
+      clusterDims.forEach((cd, idx) => {
+        const col = idx % gridCols;
+        const row = Math.floor(idx / gridCols);
+        colWidths[col] = Math.max(colWidths[col] || 0, cd.width);
+        rowHeights[row] = Math.max(rowHeights[row] || 0, cd.height);
+      });
+
+      const totalGridWidth = colWidths.reduce((sum, w) => sum + w, 0) + (gridCols - 1) * clusterGapX;
+      const startX = Math.round(centerX - totalGridWidth / 2);
+      const startY = Math.round(centerY - 100);
+
+      const clusterResults: { tempId: string; x: number; y: number; width: number; height: number }[] = [];
+      const notePositions = new Map<string, { x: number; y: number }>();
+
+      // Position clusters & their member notes
+      clusterDims.forEach((cd, idx) => {
+        const col = idx % gridCols;
+        const row = Math.floor(idx / gridCols);
+
+        let currentClusterX = startX;
+        for (let c = 0; c < col; c++) {
+          currentClusterX += colWidths[c] + clusterGapX;
+        }
+
+        let currentClusterY = startY;
+        for (let r = 0; r < row; r++) {
+          currentClusterY += rowHeights[r] + clusterGapY;
+        }
+
+        const clusterBox = {
+          tempId: cd.cluster.tempId,
+          x: Math.round(currentClusterX),
+          y: Math.round(currentClusterY),
+          width: Math.round(cd.width),
+          height: Math.round(cd.height),
+        };
+        clusterResults.push(clusterBox);
+
+        // Position notes inside cluster box
+        cd.members.forEach((thought, mIdx) => {
+          const mCol = mIdx % cd.innerCols;
+          const mRow = Math.floor(mIdx / cd.innerCols);
+          const nx = clusterBox.x + clusterPaddingX + mCol * (noteWidth + noteGapX);
+          const ny = clusterBox.y + headerH + mRow * (noteHeight + noteGapY);
+          notePositions.set(thought.tempId, { x: Math.round(nx), y: Math.round(ny) });
+        });
+      });
+
+      // Position any unclustered thoughts
+      const unclustered = thoughts.filter((t) => !t.clusterTempId || !clusters.some((c) => c.tempId === t.clusterTempId));
+      unclustered.forEach((t, uIdx) => {
+        const nx = startX + uIdx * (noteWidth + 30);
+        const ny = startY - noteHeight - 60;
+        notePositions.set(t.tempId, { x: Math.round(nx), y: Math.round(ny) });
+      });
+
+      const notes = thoughts.map((t) => {
+        const pos = notePositions.get(t.tempId) || { x: centerX, y: centerY };
+        return {
+          tempId: t.tempId,
+          x: pos.x,
+          y: pos.y,
+          width: noteWidth,
+          height: noteHeight,
+        };
+      });
+
+      return { notes, clusters: clusterResults };
+    }
+
+    // Fallback: No clusters provided -> role-based positioning
     const paddingX = 60;
     const paddingY = 60;
 
-    // Classify thoughts by role
     const mainThoughts = thoughts.filter((t) => t.role === 'main' || (!t.role && thoughts.indexOf(t) === 0));
     const prereqThoughts = thoughts.filter((t) => t.role === 'prerequisite');
     const mechThoughts = thoughts.filter((t) => t.role === 'mechanism' || (!t.role && !mainThoughts.includes(t) && thoughts.indexOf(t) < 4));
@@ -42,7 +149,6 @@ export class LayoutService {
 
     const notePositions = new Map<string, { x: number; y: number }>();
 
-    // 1. Place Main Thoughts at center
     mainThoughts.forEach((t, i) => {
       notePositions.set(t.tempId, {
         x: centerX + (i - (mainThoughts.length - 1) / 2) * (noteWidth + paddingX),
@@ -50,7 +156,6 @@ export class LayoutService {
       });
     });
 
-    // 2. Place Prerequisites at Left / Top-Left
     prereqThoughts.forEach((t, i) => {
       const col = Math.floor(i / 2);
       const row = i % 2;
@@ -60,7 +165,6 @@ export class LayoutService {
       });
     });
 
-    // 3. Place Core Mechanisms (Below / Around Main)
     mechThoughts.forEach((t, i) => {
       notePositions.set(t.tempId, {
         x: centerX + (i - (mechThoughts.length - 1) / 2) * (noteWidth + paddingX),
@@ -68,7 +172,6 @@ export class LayoutService {
       });
     });
 
-    // 4. Place Applications at Right / Top-Right
     appThoughts.forEach((t, i) => {
       const col = Math.floor(i / 2);
       const row = i % 2;
@@ -78,7 +181,6 @@ export class LayoutService {
       });
     });
 
-    // 5. Place Examples & Questions Below
     exampleThoughts.forEach((t, i) => {
       notePositions.set(t.tempId, {
         x: centerX + (i - (exampleThoughts.length - 1) / 2) * (noteWidth + paddingX),
@@ -86,7 +188,6 @@ export class LayoutService {
       });
     });
 
-    // 6. Place any remaining unclassified in radial grid
     unclassified.forEach((t, i) => {
       const angle = (i / Math.max(1, unclassified.length)) * Math.PI * 2;
       const radius = 450;
@@ -94,47 +195,6 @@ export class LayoutService {
         x: centerX + Math.cos(angle) * radius,
         y: centerY + Math.sin(angle) * radius,
       });
-    });
-
-    // Layout cluster bounding boxes based on thoughts they contain
-    const clusterResults: { tempId: string; x: number; y: number; width: number; height: number }[] = [];
-
-    clusters.forEach((cluster, idx) => {
-      const containedThoughts = thoughts.filter((t) => t.clusterTempId === cluster.tempId);
-      if (containedThoughts.length > 0) {
-        let minX = Infinity;
-        let minY = Infinity;
-        let maxX = -Infinity;
-        let maxY = -Infinity;
-
-        containedThoughts.forEach((t) => {
-          const pos = notePositions.get(t.tempId);
-          if (pos) {
-            minX = Math.min(minX, pos.x);
-            minY = Math.min(minY, pos.y);
-            maxX = Math.max(maxX, pos.x + noteWidth);
-            maxY = Math.max(maxY, pos.y + noteHeight);
-          }
-        });
-
-        const margin = 40;
-        clusterResults.push({
-          tempId: cluster.tempId,
-          x: Math.round(minX - margin),
-          y: Math.round(minY - margin - 30),
-          width: Math.round(maxX - minX + margin * 2),
-          height: Math.round(maxY - minY + margin * 2 + 30),
-        });
-      } else {
-        // Standalone cluster box
-        clusterResults.push({
-          tempId: cluster.tempId,
-          x: centerX + (idx - 1) * 380,
-          y: centerY + 400,
-          width: 340,
-          height: 280,
-        });
-      }
     });
 
     const notes = thoughts.map((t) => {
@@ -150,7 +210,7 @@ export class LayoutService {
 
     return {
       notes,
-      clusters: clusterResults,
+      clusters: [],
     };
   }
 
